@@ -7,6 +7,7 @@ examples/cities.txt
 examples/geo_gpx.pl
 examples/inline_c_directory.pl
 examples/quick_results.pl
+examples/sample_benchmark.txt
 examples/search_closest_farthest.pl
 ignore.txt
 lib/Geo/Index.pm
