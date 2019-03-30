@@ -29,5 +29,5 @@ my %config = $index->GetConfiguration( );
 if ( ( $config{code_type} eq 'float' ) || ( $config{code_type} eq 'double' ) ) {
 	print "Success, using C $config{code_type} code\n";
 } else {
-	print "\nFailed, falling back to using C $config{code_type} code\n";
+	print "\nFailed, falling back to using $config{code_type} code\n";
 }
