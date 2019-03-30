@@ -36,10 +36,8 @@ perldoc command.
 
 LICENSE AND COPYRIGHT
 
-Copyright 2019 Alex Kent Hajnal, All rights reserved
+Copyright 2019 Alexander Hajnal, All rights reserved
 
 This module is free software; you can redistribute it and/or modify it under 
 the same terms as Perl itself.  See https://dev.perl.org/licenses/artistic.html
-
-See http://dev.perl.org/licenses/ for more information.
 
