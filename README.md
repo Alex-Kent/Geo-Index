@@ -8,4 +8,4 @@ bounding box and by proximity.
 While by default computations are done for the Earth, other bodies can be 
 used by supplying appropriates radii and circumferences.
 
-See the Wiki tab for full details.
+See the [project's wiki](https://github.com/Alex-Kent/Geo-Index/wiki) for full details and documentation.
