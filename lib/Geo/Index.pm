@@ -308,7 +308,7 @@ B<C<levels>>
 
 Depth of index.  S<(valid: E<gt>0, E<lt>30; default: 20)>
 
-Note that the C<levels> parameter specefies the number of non-full-globe index 
+Note that the C<levels> parameter specifies the number of non-full-globe index 
 levels to generate and NOT the deepest index level.  (Level -1, covering the 
 entire globe, is always generated)  For example, setting C<levels> to 20 
 generates indices at levels 0 through 19 (plus level -1).
@@ -354,7 +354,7 @@ S<(default: 'C<double>' if available, 'C<perl>' otherwise)>
 Geo::Index will attempt to use compiled C code to speed up certain calculations.  
 If the compilation fails then equivalent (but slower) Perl code will be used.
 
-This option can be used to explictly request the type of code to use.  When set 
+This option can be used to explicitly request the type of code to use.  When set 
 to 'C<float>' then compiled C code using single-precision floating point will 
 be requested.  When set to 'C<double>' then compiled C code using double-precision 
 floating point will be requested.  When set to 'C<perl>' then Perl code will be 
@@ -405,7 +405,7 @@ your script:
 
 An example of doing this can be found in C<examples/inline_c_directory.pl>
 
-B<Important: >The specified directory must exist and be writable before the script 
+B<Important: >The specified directory must exist and be writeable before the script 
 is run.
 
 B<Important: >The lines MUST appear in the order shown.
@@ -545,7 +545,7 @@ C<$index-E<gt>IndexPoints( \@points );>
 Add points in list to the index
 
 If a point is added that already exists in the index and its position has 
-changed then the exisiting index entry will be deleted and the point will be 
+changed then the existing index entry will be deleted and the point will be 
 indexed again.  If its position has not changed then no action will be taken.
 
 B<C<@points>>
@@ -618,7 +618,7 @@ C<$index-E<gt>Index( \@point );>
 Add a single point to the index
 
 If the point being added already exists in the index and its position has 
-changed then the exisiting index entry will be deleted and the point will be 
+changed then the existing index entry will be deleted and the point will be 
 indexed again.  If its position has not changed then no action will be taken.
 
 B<C<%point>> or B<C<@point>>
@@ -996,7 +996,7 @@ B<C<max_results>>
 
 Return at most this many results.
 
-Unless sorting is also requested these are not guarenteed to be the closest 
+Unless sorting is also requested these are not guaranteed to be the closest 
 results to the search point.
 
 =back
@@ -1112,7 +1112,7 @@ C<undef> if no results were found.
 If either the C<sort_results> or C<radius> options were specified in the 
 search options then for each point in the results the distance in meters from 
 it to the search point will be stored in the C<search_result_distance> entry 
-in the result point's hash.  It can be retreived using e.g. 
+in the result point's hash.  It can be retrieved using e.g. 
 S<C<$meters = $$point{search_result_distance};>>
 
 See above section for the results returned when the C<quick_results> option is 
@@ -1197,7 +1197,7 @@ or more concisely
 In general, C<post_condition> functions should be preferred since the overhead 
 of the Perl function call is typically larger than that of the distance 
 calculation.  By checking the distance first, running the C<post_condition> 
-function might not be neccesary.
+function might not be necessary.
 
 =back
 
@@ -2666,7 +2666,7 @@ C<undef> if no results were found.
 
 For each point in the results the distance in meters from it to the search point 
 will be stored in the C<search_result_distance> entry in the result point's 
-hash.  It can be retreived using e.g. S<C<$meters = $$point{search_result_distance};>>
+hash.  It can be retrieved using e.g. S<C<$meters = $$point{search_result_distance};>>
 
 =back
 
@@ -4208,7 +4208,7 @@ double HaversineDistance_double(double lat_0, double lon_0) {
 
 =over
 
-C<%configuation = $index-E<gt>GetConfiguration( );>
+C<%configuration = $index-E<gt>GetConfiguration( );>
 
 Returns the running configuration of the Geo::Index object.
 
@@ -4228,7 +4228,7 @@ C<key_type> - The key type in use:
 
 =back
 
-C<code_type> - The type of backend code in use:
+C<code_type> - The type of low-level code in use:
 
 =over
 
@@ -4553,7 +4553,7 @@ sub GetIndices($$$) {
 =head2 Overview
 
 Geo::Index is intended for stand-alone applications that need a way to quickly 
-perform proximity seaches on relatively small datasets (at most a few million 
+perform proximity searches on relatively small datasets (at most a few million 
 points).  Typical search speeds are three to five orders of magnitude faster 
 than a linear search.  For larger datasets and for applications running in a 
 server environment using something like PostGIS is more appropriate.
@@ -4586,7 +4586,7 @@ That is, e.g., S<C<$results = Search(...);>> is faster than C<@results = Search(
 =item * B<Post-conditions are faster than pre-conditions.>
 
 Benchmarking has shown that the cost of the Perl function call is higher than 
-that of the distance-related code.Thus there is probably no reason to use 
+that of the distance-related code.  Thus there is probably no reason to use 
 pre-conditions.  Put concisely,
 
 =over
@@ -4683,7 +4683,7 @@ reasons, requesting a large number of closest points in a single call will also
 impact performance.  The C<Farthest(...)> method is largely a wrapper for 
 C<Closest(...)> and thus exhibits similar behavior.
 
-Some functions within Geo::Index have optional implimentations written in C.  If 
+Some functions within Geo::Index have optional implementations written in C.  If 
 these are active (by default they are whenever possible) searches typically run 
 25% to 50% faster.
 
@@ -4831,7 +4831,7 @@ containing a list of the points that lie within it.  The lowest level of the
 index covers the entire globe.  Each higher index level contains twice as many 
 tiles in each direction.  At each zoom level points are linearly mapped to 
 grid tiles based on their latitudes and longitudes using an equirectangular 
-projection.  This is fairly analagous to how typical web slippy maps are 
+projection.  This is fairly analogous to how typical web slippy maps are 
 organized (though they use a pseudo-mercator projection).
 
 As one approaches the poles the tiles become increasingly distorted with the 
@@ -4882,7 +4882,7 @@ each level, the key (comprised of C<level>, C<integer_latitide>, and
 C<integer_longitide>, see also below) is used to retrieve the corresponding 
 value from the index hash.  This value is a reference to the list of points that 
 lie within the grid tile named by the key.  The point being indexed is added to 
-the retreived list.  If there is no list stored in the index for the current key 
+the retrieved list.  If there is no list stored in the index for the current key 
 then a new list is created and added.  As a special case, all points adjacent to 
 the poles (that is points with integer latitudes of C<0> or C<max_size - 1>) use 
 the longitude C<ALL> in their keys.
@@ -4906,7 +4906,7 @@ within a given radius of a search point.  Two steps are performed by this
 method: retrieval of preliminary results and filtering of the results based on 
 the search criteria.
 
-If no search radius was specfied, if a global search was requested, or if the 
+If no search radius was specified, if a global search was requested, or if the 
 search radius covers more than half the globe then the preliminary results are 
 all points in the index.  Otherwise, the preliminary results are gathered as 
 follows:
@@ -4994,7 +4994,7 @@ special zoom level C<ALL> (with the value C<-1>) that covers the entire globe.
 Latitudes and longitudes are integers between C<0> and one less than the maximum 
 grid size for the level.  The tiles immediately adjacent to the poles are 
 treated differently.  In these areas the coverage of each tile is quite small 
-and the algorithm around the poles would normally be complex.  To accomodate 
+and the algorithm around the poles would normally be complex.  To accommodate 
 these issues, the special value C<ALL> (with the value C<-1>) is used for the 
 longitude of the polar tiles (those areas with the lowest or highest latitude 
 value for the key's level).  All points lying in a polar region are assigned to 
@@ -5005,7 +5005,7 @@ If Perl has been compiled with 64-bit support then each key is packed into a
 64 bit integer.  The level is stored in the upper 6 bits (bits 58 .. 63), the 
 integer latitude in the next 29 bits (bits 29 .. 57), and the integer longitude 
 in the low 29 bits (bits 0 .. 28).  To represent the C<ALL> value all bits in 
-the relavent field are set to C<1>.  Note that even on 32-bit systems Perl is 
+the relevant field are set to C<1>.  Note that even on 32-bit systems Perl is 
 often compiled with 64-bit support.
 
 If Perl does not have 64-bit support then a different format is used.  In most 
