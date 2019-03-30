@@ -1,0 +1,10 @@
+00_index.txt ................ This file
+benchmark.pl ................ Thorough speed benchmark
+bounds.pl ................... Example of using SearchByBounds(...)
+cities.gpx .................. Data file used by the geo_gpx.pl
+cities.txt .................. Data file used by some of the other examples
+geo_gpx.pl .................. Example showing use with Geo::Gpx
+inline_c_directory.pl ....... Shows how to use an alternate directory for Inline::C
+quick_results.pl ............ Example comparing normal and quick searches
+search_closest_farthest.pl .. Example comparing Search(...) to Closest() and Farthest()
+
