@@ -38,7 +38,7 @@ for your environment.  The following should appear near the top of your script:
     # Load the module
     use Geo::Index;
 
-An example of doing this can be found in C'examples/inline_c_directory.pl'
+An example of doing this can be found in 'examples/inline_c_directory.pl'
 
 Important: The specified directory must exist and be writeable before the script
            is run.
