@@ -5,8 +5,8 @@ may be desirable to lock down the script so that it cannot write to files; this
 would normally prevent Inline::C from functioning.
 
 If you are running in a server environment and want to use the accelerated C 
-functions but do not want Inline::C to be able to write files to your script's 
-working directory then there are two options available:
+functions but do not want to make your script's working directory writable then 
+there are two options available:
 
 
 Option 1: Pre-build the C code
