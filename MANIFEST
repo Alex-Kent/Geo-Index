@@ -16,6 +16,7 @@ Makefile.PL
 MANIFEST
 README
 README.md
+README.use_on_a_server
 t/00-load.t
 t/boilerplate.t
 t/manifest.t
