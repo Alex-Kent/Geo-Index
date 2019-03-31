@@ -11,6 +11,7 @@ examples/sample_benchmark.txt
 examples/search_closest_farthest.pl
 ignore.txt
 lib/Geo/Index.pm
+LICENSE
 Makefile.PL
 MANIFEST
 README
