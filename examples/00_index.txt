@@ -6,5 +6,6 @@ cities.txt .................. Data file used by some of the other examples
 geo_gpx.pl .................. Example showing use with Geo::Gpx
 inline_c_directory.pl ....... Shows how to use an alternate directory for Inline::C
 quick_results.pl ............ Example comparing normal and quick searches
+sample_benchmark.txt ........ Sample output from benchmark.pl
 search_closest_farthest.pl .. Example comparing Search(...) to Closest() and Farthest()
 
