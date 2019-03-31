@@ -1,0 +1,46 @@
+Geo::Index uses compiled C code to accelerate certain functions.  The C code is 
+compiled using Inline::C with the compiled files, by default, written to a sub-
+directory of the calling script's working directory.  In a server environment it
+may be desirable to lock down the script so that it cannot write to files; this 
+would normally prevent Inline::C from functioning.
+
+If you are running in a server environment and want to use the accelerated C 
+functions but do not want Inline::C to be able to write files to your script's 
+working directory then there are two options available:
+
+
+Option 1: Pre-build the C code
+--------------------------------------------------------------------------------
+
+To do this log in to the server as yourself (or another user as appropriate) 
+then 'cd' to the script's working directory.  Next, run the following command:
+
+   perl -e "use Geo::Index;"
+
+The C code should automatically be compiled and stored in the '_Inline/' sub-
+directory.  Once this has been done, change permissions and/or ownership of 
+the '_Inline/' subdirectory and its contents to suit your liking.  A simple 
+'chmod -w -R _Inline' might suffice.
+
+
+Option 2: Specify a build and library directory
+--------------------------------------------------------------------------------
+
+If you want to use the compiled C functions but don't want the build to be done 
+in the current directory, you can specify an alternate build and library direct-
+ory here.  The example below creates 'build/' and 'lib/' directories along with 
+a 'config' file in '/tmp/'.  For your own scripts, change '/tmp' as appropriate 
+for your environment.  The following should appear near the top of your script:
+
+    # Specify the build and library directory
+    use Inline(Config => DIRECTORY => '/tmp');
+    
+    # Load the module
+    use Geo::Index;
+
+An example of doing this can be found in C'examples/inline_c_directory.pl'
+
+Important: The specified directory must exist and be writeable before the script
+           is run.
+
+Important: The lines MUST appear in the order shown.
