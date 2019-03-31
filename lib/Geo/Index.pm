@@ -133,7 +133,7 @@ This document describes Geo::Index version 0.1.0
 =head1 DESCRIPTION
 
 Geo::Index is a Perl module for creating in-memory geographic points indices. 
-Once indexed, fast searches can be run.  
+Once points have been indexed, fast searches can be run.  
 
 Efficient searches methods include B<C<Search(...)>> to get all points 
 within a distance from a given point, B<C<SearchByBounds(...)>> to get all 
