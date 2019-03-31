@@ -1,11 +1,10 @@
 # Geo::Index
 
-Geo::Index is a Perl module that allows the creation of in-memory geographic 
-indices of sets of points.  Once an index has been created one can run fast 
-searches against the index.  The module supports search by radius, by 
+Geo::Index is a Perl module for creating in-memory geographic points indices.  
+Once indexed, fast searches can be run.  This module supports search by radius, by 
 bounding box and by proximity.
 
-While by default computations are done for the Earth, other bodies can be 
-used by supplying appropriates radii and circumferences.
+By default indexing is done for the Earth but other bodies can be 
+indexed by supplying appropriates radii and circumferences.
 
 See the [project's wiki](https://github.com/Alex-Kent/Geo-Index/wiki) for full details and documentation.
