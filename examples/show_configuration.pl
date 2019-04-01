@@ -23,14 +23,20 @@ my %config = $index->GetConfiguration();
 print "Running configuration:\n\n";
 
 # Custom labels for particular keys
-my %key_map = ( 'size' => 'Indexed points' );
+my %key_map = (
+                'size'       => 'Indexed points', 
+                'tile_width' => 'Most-detailed tile size'
+              );
 
 # Loop through configuration keys in a set order...
 foreach my $key ( qw( levels size ), 
                   undef,
                   qw( key_type code_type supported_key_types supported_code_types ), 
                   undef,
-                  qw( planetary_radius ), 
+                  qw( planetary_radius equatorial_circumference polar_circumference ), 
+                  undef,
+                  qw( tile_width ), 
+                  undef,
                   keys %config ) {
 	
 	unless ( defined $key ) {
@@ -48,15 +54,27 @@ foreach my $key ( qw( levels size ),
 	my $label = ( defined $key_map{$key} ) ? $key_map{$key} : ucfirst $key;
 	$label =~ s/_/ /g;
 	
-	# Join list values (if applicable)
-	$value = join( ", ", @$value) if ( ref $value eq 'ARRAY' );
+	# Clean up value (when applicable)
+	if ( $key eq 'tile_width' ) {
+		$value = ( $value > 100.0 )
+		       ? int $value
+		       : ( $value > 1.0 )
+		         ? sprintf("%.1f", $value)
+		         : sprintf("%.5f", $value);
+		
+	} elsif ( ref $value eq 'ARRAY' ) {
+		# Join values
+		$value = join( ", ", @$value);
+	}
 	
 	# Add units to values (if applicable)
 	$value .= ' meters' if ( $key =~ /_(radius|circumference)$/ );
+	$value .= ' meters at the equator' if ( $key eq 'tile_width' );
 	
 	# Display the configuration line
 	printf( "%30s: %s\n", $label, $value );
 }
+
 
 
 

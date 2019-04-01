@@ -4279,6 +4279,8 @@ C<equatorial_circumference> - Equatorial circumference (in meters)
 	
 C<size> - Number of points currently indexed
 
+C<tile_width> - Width in meters of each tile at most-detailed level of index
+
 =back
 
 =back
@@ -4308,6 +4310,9 @@ sub GetConfiguration($) {
 	
 	#. Number of points in index
 	$config{size} = scalar keys %{$self->{indices}};
+	
+	#. Width in meters of each tile at most-detailed level of index
+	$config{tile_width} = $config{equatorial_circumference} / ( 2**$config{levels} );
 	
 	return %config;
 }
