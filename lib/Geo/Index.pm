@@ -5482,7 +5482,7 @@ on your submission as it takes place. Any other comments can be sent to C<akh@cp
 
 =head1 VERSION HISTORY
 
-B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
+B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes and minor enhancements
 
 =over
 
