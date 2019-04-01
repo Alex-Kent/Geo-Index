@@ -1,5 +1,20 @@
 Revision history for Geo-Index
 
-0.0.1   2019-03-30
-        Pre-release version
+0.0.3   2019-04-01
+Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
 
+  o Sweep(...): New method
+  o Vacuum(...): New method
+  o Added tests
+  o SearchByBounds(...): Bug fixes
+  o new(...): Added 'quiet' option
+
+0.0.2   2019-03-31
+Bug fixes and minor enhancements
+
+  o Index(...): Fixed bug for points added near (but not at) the north pole
+  o GetConfiguration(...): Added 'supported_key_types', 'supported_code_types', 
+	  and 'tile_meters' values
+
+0.0.1   2019-03-30
+Initial release
