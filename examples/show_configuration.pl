@@ -51,6 +51,9 @@ foreach my $key ( qw( levels size ),
 	# Join list values (if applicable)
 	$value = join( ", ", @$value) if ( ref $value eq 'ARRAY' );
 	
+	# Add units to values (if applicable)
+	$value .= ' meters' if ( $key =~ /_(radius|circumference)$/ );
+	
 	# Display the configuration line
 	printf( "%30s: %s\n", $label, $value );
 }
