@@ -4591,7 +4591,7 @@ B<C<%point>> or B<C<@points>>
 
 =over
 
-Either the point or a list of points to remove metadata from.
+The point or a list of points to remove metadata from.
 
 =back
 
@@ -4657,7 +4657,7 @@ B<C<%point>> or B<C<@points>>
 
 =over
 
-Either the point or a list of points to remove metadata from.
+The point or a list of points to remove metadata from.
 
 =back
 
