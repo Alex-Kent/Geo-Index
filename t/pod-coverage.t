@@ -27,6 +27,8 @@ my $_internal_functions = [
                             'GetIntLat', 
                             'GetIntLatLon', 
                             'GetIntLon', 
+                            'GetLowLevelCodeType', 
+                            'GetSupportedLowLevelCodeTypes', 
                             'GetValue', 
                             'HaversineDistance', 
                             'HaversineDistance_double', 
