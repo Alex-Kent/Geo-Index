@@ -4781,7 +4781,7 @@ run times.
 A fairly typical search yielding about 50 results runs at about 10,000 searches 
 per second in normal mode and about 30,000 searches per second in quick mode.
 A nearly worst case example is a search returning 100,000 points; this will run 
-at about 5 searches per second in normal mode or about 8000 searches per second 
+at about 5 searches per second in normal mode or about 8,000 searches per second 
 in quick mode.
 
 
