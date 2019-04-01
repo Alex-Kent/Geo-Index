@@ -5191,6 +5191,20 @@ or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue
 I will receive notification when you do and you will be automatically notified 
 of progress on your submission as it takes place.
 
+=head1 VERSION HISTORY
+
+B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
+
+=over
+
+=item * B<Index(...)>: Fixed bug for points added near (but not at) the north pole
+
+=item * B<GetConfiguration(...)>: Added supported_key_types, supported_code_types, and tile_meters values
+
+=back
+
+B<0.0.1> (2018-03-30) - Initial release
+
 =head1 AUTHOR
 
 Alex Kent Hajnal S<  > C<akh@cpan.org> S<  > L<https://alephnull.net/software>
