@@ -24,8 +24,8 @@ print "Running configuration:\n\n";
 
 # Custom labels for particular keys
 my %key_map = (
-                'size'       => 'Indexed points', 
-                'tile_width' => 'Most-detailed tile size'
+                'size'        => 'Indexed points', 
+                'tile_meters' => 'Most-detailed tile size'
               );
 
 # Loop through configuration keys in a set order...
@@ -35,7 +35,7 @@ foreach my $key ( qw( levels size ),
                   undef,
                   qw( planetary_radius equatorial_circumference polar_circumference ), 
                   undef,
-                  qw( tile_width ), 
+                  qw( tile_meters ), 
                   undef,
                   keys %config ) {
 	
@@ -55,7 +55,7 @@ foreach my $key ( qw( levels size ),
 	$label =~ s/_/ /g;
 	
 	# Clean up value (when applicable)
-	if ( $key eq 'tile_width' ) {
+	if ( $key eq 'tile_meters' ) {
 		$value = ( $value > 100.0 )
 		       ? int $value
 		       : ( $value > 1.0 )
@@ -69,7 +69,7 @@ foreach my $key ( qw( levels size ),
 	
 	# Add units to values (if applicable)
 	$value .= ' meters' if ( $key =~ /_(radius|circumference)$/ );
-	$value .= ' meters at the equator' if ( $key eq 'tile_width' );
+	$value .= ' meters at the equator' if ( $key eq 'tile_meters' );
 	
 	# Display the configuration line
 	printf( "%30s: %s\n", $label, $value );
