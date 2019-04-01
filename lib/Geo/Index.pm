@@ -230,8 +230,8 @@ reference to the hash constructed by Geo::Index and not as a reference to the
 original array.  To access the data field of a point created using the shorthand 
 notation use C<$$point{'data'}> where C<$point> is a search result point.
 
-The C<Vacuum(...)> method can be used to remove all generated values from a 
-point or points.
+Any fields added to the indexed points by Geo::Index can be removed using 
+Sweep(...) and Vacuum(...).
 
 =head1 METHODS
 
