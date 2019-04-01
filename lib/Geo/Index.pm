@@ -1,5 +1,7 @@
 package Geo::Index;
 
+require 5.00405;
+
 use warnings;
 use strict;
 
@@ -79,7 +81,7 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.2';
+$VERSION = 'v0.0.3';
 
 =head1 VERSION
 
@@ -214,6 +216,8 @@ reference to the hash constructed by Geo::Index and not as a reference to the
 original array.  To access the data field of a point created using the shorthand 
 notation use C<$$point{'data'}> where C<$point> is a search result point.
 
+The C<Vacuum(...)> method can be used to remove all generated values from a 
+point or points.
 
 =head1 METHODS
 
@@ -224,7 +228,7 @@ BEGIN {
 } # END BEGIN
 
 
-use fields qw(index indices positions planetary_radius planetary_diameter polar_circumference equatorial_circumference levels max_level max_size);
+use fields qw(index indices positions planetary_radius planetary_diameter polar_circumference equatorial_circumference levels max_level max_size quiet);
 
 
 
@@ -535,6 +539,8 @@ sub new($;$$) {
 	if ( (defined $_points) && (scalar @$_points) ) {
 		$self->IndexPoints($_points);
 	}
+	
+	$self->{quiet} = ( defined $_options->{quiet} ) ? $_options->{quiet} : 0;
 	
 	return $self;
 }
@@ -910,7 +916,7 @@ sub AddValue($$$) {
 #. Return the index entry for a given key
 #. Keys are either 64-bit integers or array 
 #. references: [ level, lat_idx, lon_idx ]
-# Used by Search, Closest, DeletePointIndex
+# Used by Search, Closest, DeletePointIndex, Sweep, Vacuum
 sub GetValue($$) {
 	my ($self, $key) = @_;
 	
@@ -1273,8 +1279,6 @@ sub Search($$;$) {
 	$quick_results = (defined $quick_results) ? 1 : 0;
 	
 	$search_radius = ALL unless defined ($search_radius);
-	
-	my @keys = (); #. The index keys to return points from
 	
 	my $_results = [ ];
 	my @result_set = ();
@@ -2059,6 +2063,8 @@ active.
 =cut
 
 
+use constant TRACE_BOUNDS => 0;  # Uncomment for no tracing of this method
+#use constant TRACE_BOUNDS => 1;  # Uncomment to enable tracing of this method
 
 sub SearchByBounds($$;$) {
 	my ($self, $_bounding_box, $_options) = @_;
@@ -2109,30 +2115,30 @@ sub SearchByBounds($$;$) {
 	my $has_errors = 0;
 	
 	if ($west < -180.0) {
-		carp "In SearchByBounds: west bound $west is out of range ( < -180 )";
+		carp "In SearchByBounds: west bound $west is out of range ( < -180 )" unless $self->{quiet};
 		$has_errors = 1;
 	}
 	
 	if ($east > 180.0) {
-		carp "In SearchByBounds: east bound $east is out of range ( > 180 )";
+		carp "In SearchByBounds: east bound $east is out of range ( > 180 )" unless $self->{quiet};
 		$has_errors = 1;
 	}
 	
 	if ($south < -90.0) {
-		carp "In SearchByBounds: south bound $south is out of range ( < -90 )";
+		carp "In SearchByBounds: south bound $south is out of range ( < -90 )" unless $self->{quiet};
 		$has_errors = 1;
 	}
 	
 	if ($north > 90.0) {
-		carp "In SearchByBounds: north bound $north is out of range ( > 90 )";
+		carp "In SearchByBounds: north bound $north is out of range ( > 90 )" unless $self->{quiet};
 		$has_errors = 1;
 	}
 	
 	if ($south > $north) {
-		carp "In SearchByBounds: south bound greater than north bound ( $south > $north )";
+		carp "In SearchByBounds: south bound greater than north bound ( $south > $north )" unless $self->{quiet};
 		$has_errors = 1;
 	} elsif ($south == $north) {
-		carp "In SearchByBounds: bounds cover no area ( south > north: $south > $north )";
+		carp "In SearchByBounds: bounds cover no area ( south > north: $south > $north )" unless $self->{quiet};
 		$has_errors = 1;
 	}
 	
@@ -2174,7 +2180,14 @@ sub SearchByBounds($$;$) {
 	
 	$quick_results = (defined $quick_results) ? 1 : 0;
 	
-	my @keys = (); #. The index keys to return points from
+	if ( TRACE_BOUNDS ) {
+		print "Bounds:    W: $west, S: $south, E: $east, N: $north\n";
+	}
+	
+	my @keys; #. The index keys to return points from
+	if ( TRACE_BOUNDS) {
+		@keys = ();
+	}
 	
 	my $_results = [ ];
 	my @result_set = ();
@@ -2191,12 +2204,16 @@ sub SearchByBounds($$;$) {
 	
 	my $lat_degrees = $north - $south;
 	if ($lat_degrees <= 0) {
-		carp "In SearchByBounds north ($north) is less than or equal to south ($south)!\n";
+		carp "In SearchByBounds north ($north) is less than or equal to south ($south)!\n" unless $self->{quiet};
 		return (wantarray) ? ( ) : undef;
 	}
 	
 	my $lon_degrees = ($west <= $east) ? $east - $west               #. Normal case
-	                                   : ( $west + 360.0 ) - $east;  #. Straddles antimeridian
+	                                   : ( $east + 360.0 ) - $west;  #. Straddles antimeridian
+	
+	if ( TRACE_BOUNDS) {
+		print "my \$lon_degrees = $lon_degrees = ($west <= $east) ? $east - $west : ( $east + 360.0 ) - $west;\n";
+	}
 	
 	#. Determine grid level to use
 	
@@ -2204,12 +2221,13 @@ sub SearchByBounds($$;$) {
 	my $lon_best_level = fast_log2( 360.0 / $lon_degrees );
 	
 	$grid_level = ( $lat_best_level > $lon_best_level ) ? $lat_best_level : $lon_best_level;
+	$grid_level -= $tile_adjust;
 	
 	#. Determine shift and grid size for the chosen level
 	
 	$shift = $max_level - $grid_level;
 	
-	$shift += $tile_adjust;
+	#$shift += $tile_adjust;
 	
 	$grid_size = 2**( $grid_level + 1 );
 	$max_grid_idx = $grid_size - 1;
@@ -2227,13 +2245,28 @@ sub SearchByBounds($$;$) {
 	$east_idx  = $max_grid_idx if ($east == 180.0);  #. Special case for antimeridian as east bound
 	$north_idx = $max_grid_idx if ($north == 90.0);  #. Special case for north pole as north bound
 	
+	my $include_south_pole = ( $south == -90.0 ) ? 1 : 0;
+	my $include_north_pole = ( $north ==  90.0 ) ? 1 : 0;
+	
+	if ( TRACE_BOUNDS) {
+		print "Poles:\tN: $include_north_pole\tS: $include_south_pole\n";
+		
+		print "Integer:   W: $west_int, S: $south_int, E: $east_int, N: $north_int\n";
+		print "Index ($grid_level): W: $west_idx, S: $south_idx, E: $east_idx, N: $north_idx\n";
+		print "Shift: $shift\tgrid_size: $grid_size\tmax_grid_idx: $max_grid_idx\n";
+		print "---\n\n";
+	}
+	
 	#. Gather preliminary search results
 	
 	if (USE_NUMERIC_KEYS) {
 		my $seen_n_polar = 0;
 		my $seen_s_polar = 0;
-		if ( $west_idx <= $east_idx ) {
+		if ( $west <= $east ) {
 			#. Does not straddle antimeridian
+			if ( TRACE_BOUNDS) {
+				print "NORMAL\n";
+			}
 			for (my $lat_idx = $south_idx; $lat_idx <= $north_idx; $lat_idx++) {
 				if ( $lat_idx == 0 ) {
 					#. Near south pole
@@ -2245,6 +2278,7 @@ sub SearchByBounds($$;$) {
 						} else {
 							$key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | MASK_LATLON ;
 						}
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 						push @result_set, $$_points{$key};
 					}
 					
@@ -2258,6 +2292,7 @@ sub SearchByBounds($$;$) {
 						} else {
 							$key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | MASK_LATLON ;
 						}
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 						push @result_set, $$_points{$key};
 					}
 					
@@ -2272,6 +2307,7 @@ sub SearchByBounds($$;$) {
 							$key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | $clipped_lon_idx ;
 						}
 						push @result_set, $$_points{$key};
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ]" if ( TRACE_BOUNDS);
 					}
 				}
 				
@@ -2280,6 +2316,9 @@ sub SearchByBounds($$;$) {
 			
 		} else { # ($west_idx > $east_idx)
 			#. Straddles antimeridian
+			if ( TRACE_BOUNDS) {
+				print "STRADDLES ANTIMERIDIAN\n";
+			}
 			for (my $lat_idx = $south_idx; $lat_idx <= $north_idx; $lat_idx++) {
 				
 				if ( $lat_idx == 0 ) {
@@ -2288,6 +2327,7 @@ sub SearchByBounds($$;$) {
 						$seen_s_polar = 1;
 						my $key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | MASK_LATLON ;
 						push @result_set, $$_points{$key};
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} elsif ( $lat_idx >= $max_grid_idx ) {
@@ -2296,6 +2336,7 @@ sub SearchByBounds($$;$) {
 						$seen_n_polar = 1;
 						my $key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | MASK_LATLON ;
 						push @result_set, $$_points{$key};
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} else {
@@ -2306,13 +2347,15 @@ sub SearchByBounds($$;$) {
 						my $clipped_lon_idx = $lon_idx % $grid_size;
 						my $key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | $clipped_lon_idx ;
 						push @result_set, $$_points{$key};
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ]" if ( TRACE_BOUNDS);
 					}
 					
 					#. West side
-					for (my $lon_idx = 0; $lon_idx <= $east_idx; $lon_idx++) {
+					for (my $lon_idx = 0; $lon_idx < $east_idx; $lon_idx++) {
 						my $clipped_lon_idx = $lon_idx % $grid_size;
 						my $key = ( $grid_level << 58 ) | ( $lat_idx << 29 ) | $clipped_lon_idx ;
 						push @result_set, $$_points{$key};
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ]" if ( TRACE_BOUNDS);
 					}
 				}
 			}
@@ -2323,8 +2366,11 @@ sub SearchByBounds($$;$) {
 		
 		my $seen_n_polar = 0;
 		my $seen_s_polar = 0;
-		if ($west_idx <= $east_idx) {
+		if ($west <= $east) {
 			#. Does not straddle antimeridian
+			if ( TRACE_BOUNDS) {
+				print "NORMAL\n";
+			}
 			for (my $lat_idx = $south_idx; $lat_idx <= $north_idx; $lat_idx++) {
 			
 				if ( $lat_idx == 0 ) {
@@ -2333,6 +2379,7 @@ sub SearchByBounds($$;$) {
 						$seen_s_polar = 1;
 						my $key = [ $grid_level, $lat_idx, ALL ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} elsif ( $lat_idx >= $max_grid_idx ) {
@@ -2341,14 +2388,16 @@ sub SearchByBounds($$;$) {
 						$seen_n_polar = 1;
 						my $key = [ $grid_level, $lat_idx, ALL ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} else {
 					#. Normal case
 					for (my $lon_idx = $west_idx; $lon_idx <= $east_idx; $lon_idx++) {
 						my $clipped_lon_idx = $lon_idx % $grid_size;
-						my $key = [ $grid_level, $lat_idx, $clipped_lon_idx ];
+						my $key = [ $grid_level, $lat_idx, $clipped_lon_idx  ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ($lon_idx) ]" if ( TRACE_BOUNDS);
 					}
 				}
 				
@@ -2357,6 +2406,9 @@ sub SearchByBounds($$;$) {
 			
 		} else {  # ($west_idx > $east_idx)
 			#. Straddles antimeridian
+			if ( TRACE_BOUNDS) {
+				print "STRADDLES ANTIMERIDIAN\n";
+			}
 			for (my $lat_idx = $south_idx; $lat_idx <= $north_idx; $lat_idx++) {
 				
 				if ( $lat_idx == 0 ) {
@@ -2365,6 +2417,7 @@ sub SearchByBounds($$;$) {
 						$seen_s_polar = 1;
 						my $key = [ $grid_level, $lat_idx, ALL ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} elsif ( $lat_idx >= $max_grid_idx ) {
@@ -2373,6 +2426,7 @@ sub SearchByBounds($$;$) {
 						$seen_n_polar = 1;
 						my $key = [ $grid_level, $lat_idx, ALL ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, ALL ]" if ( TRACE_BOUNDS);
 					}
 					
 				} else {
@@ -2383,19 +2437,23 @@ sub SearchByBounds($$;$) {
 						my $clipped_lon_idx = $lon_idx % $grid_size;
 						my $key = [ $grid_level, $lat_idx, $clipped_lon_idx ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ($lon_idx, E) ]" if ( TRACE_BOUNDS);
 					}
 					
 					#. West side
-					for (my $lon_idx = 0; $lon_idx <= $east_idx; $lon_idx++) {
+					for (my $lon_idx = 0; $lon_idx < $east_idx; $lon_idx++) {
 						my $clipped_lon_idx = $lon_idx % $grid_size;
 						my $key = [ $grid_level, $lat_idx, $clipped_lon_idx ];
 						push @result_set, $self->GetValue($key);
+						push @keys, "[ $grid_level, $lat_idx, $clipped_lon_idx ($lon_idx, W) ]" if ( TRACE_BOUNDS);
 					}
 				}
 			}
 		} # END straddles antimeridian
 	
 	} # END using split keys
+	
+	print join("\n", @keys); print "\n" if ( TRACE_BOUNDS);
 	
 	if ( $quick_results ) {
 		#. Return preliminary results
@@ -2415,6 +2473,9 @@ sub SearchByBounds($$;$) {
 	
 	if ($west <= $east) {
 		#. Normal case
+		if ( TRACE_BOUNDS) {
+			print "NORMAL\n";
+		}
 		
 		if (defined $condition) {
 			#. Filter specified
@@ -2425,14 +2486,34 @@ sub SearchByBounds($$;$) {
 					my $p_lat = $$_point{lat};
 					my $p_lon = $$_point{lon};
 					
+					if ( TRACE_BOUNDS) {
+						print "--------------------------------------------------------------------------------\n";
+						print "					     ( p_lat:$p_lat >= south:$south ) &&\n";
+						print "					     ( p_lat:$p_lat <= north:$north ) &&\n";
+						print "					     (\n";
+						print "					       ( p_lon:$p_lon >= west:$west ) ||\n";
+						print "					       ( p_lon:$p_lon <= east:$east ) ||\n";
+						print "						     ( include_south_pole:$include_south_pole && p_lat:$p_lat == -90.0 ) ||\n";
+						print "						     ( include_north_pole:$include_north_pole && p_lat:$p_lat == 90.0 )\n";
+						print "					     )\n";
+						print "--------------------------------------------------------------------------------\n";
+					}
+					
 					if ( 
-					     ( $p_lat >= $south ) &&
-					     ( $p_lat <= $north ) &&
-					     ( $p_lon >= $west ) &&
-					     ( $p_lon <= $east )
+					     (
+					       ( $p_lat >= $south ) &&
+					       ( $p_lat <= $north ) &&
+					       ( $p_lon >= $west ) &&
+					       ( $p_lon <= $east )
+					     ) ||
+					     ( $include_south_pole && $p_lat == -90.0 ) ||
+					     ( $include_north_pole && $p_lat == 90.0 )
 					   ) {
 						if ( &$condition($_point, $_bounding_box, $user_data) ) {
 							push @$_results, $_point;
+							print "POINT: $$_point{name}\n" if ( TRACE_BOUNDS);
+						} else {
+							print "-----: $$_point{name}\n" if ( TRACE_BOUNDS);
 						}
 					}
 				}
@@ -2445,13 +2526,33 @@ sub SearchByBounds($$;$) {
 					my $p_lat = $$_point{lat};
 					my $p_lon = $$_point{lon};
 					
+					if ( TRACE_BOUNDS) {
+						print "--------------------------------------------------------------------------------\n";
+						print "					     ( p_lat:$p_lat >= south:$south ) &&\n";
+						print "					     ( p_lat:$p_lat <= north:$north ) &&\n";
+						print "					     (\n";
+						print "					       ( p_lon:$p_lon >= west:$west ) ||\n";
+						print "					       ( p_lon:$p_lon <= east:$east ) ||\n";
+						print "						     ( include_south_pole:$include_south_pole && p_lat:$p_lat == -90.0 ) ||\n";
+						print "						     ( include_north_pole:$include_north_pole && p_lat:$p_lat == 90.0 )\n";
+						print "					     )\n";
+						print "--------------------------------------------------------------------------------\n";
+					}
+					
 					if ( 
-					     ( $p_lat >= $south ) &&
-					     ( $p_lat <= $north ) &&
-					     ( $p_lon >= $west ) &&
-					     ( $p_lon <= $east )
+					     (
+					       ( $p_lat >= $south ) &&
+					       ( $p_lat <= $north ) &&
+					       ( $p_lon >= $west ) &&
+					       ( $p_lon <= $east )
+					     ) ||
+					     ( $include_south_pole && $p_lat == -90.0 ) ||
+					     ( $include_north_pole && $p_lat == 90.0 )
 					   ) {
 						push @$_results, $_point;
+						print "POINT: $$_point{name}\n" if ( TRACE_BOUNDS);
+					} else {
+						print "-----: $$_point{name}\n" if ( TRACE_BOUNDS);
 					}
 				}
 			}
@@ -2459,6 +2560,9 @@ sub SearchByBounds($$;$) {
 		
 	} else {
 		#. Straddles antimeridian (west > east)
+		if ( TRACE_BOUNDS) {
+			print "STRADDLES ANTIMERIDIAN\n";
+		}
 		
 		if (defined $condition) {
 			#. Filter specified
@@ -2469,16 +2573,34 @@ sub SearchByBounds($$;$) {
 					my $p_lat = $$_point{lat};
 					my $p_lon = $$_point{lon};
 					
+					if ( TRACE_BOUNDS) {
+						print "--------------------------------------------------------------------------------\n";
+						print "					     ( p_lat:$p_lat >= south:$south ) &&\n";
+						print "					     ( p_lat:$p_lat <= north:$north ) &&\n";
+						print "					     (\n";
+						print "					       ( p_lon:$p_lon >= west:$west ) ||\n";
+						print "					       ( p_lon:$p_lon <= east:$east ) ||\n";
+						print "						     ( include_south_pole:$include_south_pole && p_lat:$p_lat == -90.0 ) ||\n";
+						print "						     ( include_north_pole:$include_north_pole && p_lat:$p_lat == 90.0 )\n";
+						print "					     )\n";
+						print "--------------------------------------------------------------------------------\n";
+					}
+					
 					if ( 
 					     ( $p_lat >= $south ) &&
 					     ( $p_lat <= $north ) &&
 					     (
-					       ( $p_lon <= $west ) ||
-					       ( $p_lon >= $east )
+					       ( $p_lon >= $west ) ||
+					       ( $p_lon <= $east ) ||
+						     ( $include_south_pole && $p_lat == -90.0 ) ||
+						     ( $include_north_pole && $p_lat == 90.0 )
 					     )
 					   ) {
 						if ( &$condition($_point, $_bounding_box, $user_data) ) {
 							push @$_results, $_point;
+							print "POINT: $$_point{name}\n" if ( TRACE_BOUNDS);
+						} else {
+							print "-----: $$_point{name}\n" if ( TRACE_BOUNDS);
 						}
 					}
 				}
@@ -2491,15 +2613,33 @@ sub SearchByBounds($$;$) {
 					my $p_lat = $$_point{lat};
 					my $p_lon = $$_point{lon};
 					
+					if ( TRACE_BOUNDS) {
+						print "--------------------------------------------------------------------------------\n";
+						print "					     ( p_lat:$p_lat >= south:$south ) &&\n";
+						print "					     ( p_lat:$p_lat <= north:$north ) &&\n";
+						print "					     (\n";
+						print "					       ( p_lon:$p_lon >= west:$west ) ||\n";
+						print "					       ( p_lon:$p_lon <= east:$east ) ||\n";
+						print "						     ( include_south_pole:$include_south_pole && p_lat:$p_lat == -90.0 ) ||\n";
+						print "						     ( include_north_pole:$include_north_pole && p_lat:$p_lat == 90.0 )\n";
+						print "					     )\n";
+						print "--------------------------------------------------------------------------------\n";
+					}
+					
 					if ( 
 					     ( $p_lat >= $south ) &&
 					     ( $p_lat <= $north ) &&
 					     (
-					       ( $p_lon <= $west ) ||
-					       ( $p_lon >= $east )
+					       ( $p_lon >= $west ) ||
+					       ( $p_lon <= $east ) ||
+						     ( $include_south_pole && $p_lat == -90.0 ) ||
+						     ( $include_north_pole && $p_lat == 90.0 )
 					     )
 					   ) {
 						push @$_results, $_point;
+						print "POINT: $$_point{name}\n" if ( TRACE_BOUNDS);
+					} else {
+						print "-----: $$_point{name}\n" if ( TRACE_BOUNDS);
 					}
 				}
 			}
@@ -3805,14 +3945,14 @@ sub SetDistanceFunctionType($) {
 
 #. Returns the type of low-level functions that is active
 #. (one of 'perl', 'float', or 'double')
-# used by GetConfiguration
+# used by GetConfiguration, t/low-level.t
 sub GetLowLevelCodeType() {
 	return $ACTIVE_CODE;
 }
 
 #. Returns reference to list of the supported low-level function types
 #. (list values as per GetLowLevelCodeType)
-# used by GetConfiguration
+# used by GetConfiguration, t/low-level.t
 sub GetSupportedLowLevelCodeTypes() {
 	return [ @SUPPORTED_CODE ];
 }
@@ -4423,6 +4563,140 @@ sub GetStatistics($) {
 	}
 	
 	return @stats;
+}
+
+
+
+
+=head2 Sweep( ... )
+
+=over
+
+C<$index-E<gt>Sweep( );>
+
+C<$index-E<gt>Sweep( \%point );>
+
+C<$index-E<gt>Sweep( \@points );>
+
+Remove data generated by searches from some or all points
+
+The fields that will be removed are C<search_result_distance> and C<antipode_distance>.
+
+Called on its own (with no point or points specified) this method will remove 
+data generated by searches from all points.
+
+See also C<Vacuum(...)>.
+
+B<C<%point>> or B<C<@points>>
+
+=over
+
+Either the point or a list of points to remove metadata from.
+
+=back
+
+=back
+
+=cut
+
+
+#. Remove data generated search methods from some or all points
+# not used internally
+sub Sweep($;$) {
+	my ($self, $_points) = @_;
+	
+	if ( ! defined $_points ) {
+		# Use all points in index if none were specified
+		my $key;
+		if (USE_NUMERIC_KEYS) {
+			if (USE_PACKED_KEYS) {
+				$key = pack("Q", ( MASK_LEVEL << 58 ) | ( MASK_LATLON << 29 ) | MASK_LATLON );
+			} else {
+				$key = ( MASK_LEVEL << 58 ) | ( MASK_LATLON << 29 ) | MASK_LATLON;
+			}
+		} else {
+			$key = [ ALL, ALL, ALL ];
+		}
+		$_points = $self->GetValue($key);
+		
+	} elsif ( ref $_points eq 'HASH' ) {
+		# Build list if passed a single point
+		$_points = [ $_points ];
+	}
+	
+	foreach my $_point ( @$_points ) {
+		delete $$_point{search_result_distance};
+		delete $$_point{antipode_distance};
+	}
+}
+
+
+
+
+=head2 Vacuum( ... )
+
+=over
+
+C<$index-E<gt>Vacuum( );>
+
+C<$index-E<gt>Vacuum( \%point );>
+
+C<$index-E<gt>Vacuum( \@points );>
+
+Remove all data generated by Geo::Index from some or all points
+
+The fields that will be removed are: C<lat_rad>, C<lon_rad>, C<circumference>, 
+C<search_result_distance>, C<antipode_distance>.
+
+Called on its own (with no point or points specified) this method will remove 
+all generated data from all points.
+
+See also C<Sweep(...)>.
+
+B<C<%point>> or B<C<@points>>
+
+=over
+
+Either the point or a list of points to remove metadata from.
+
+=back
+
+=back
+
+=cut
+
+
+#. Remove all data generated by Geo::Index from some or all points
+# not used internally
+sub Vacuum($;$) {
+	my ($self, $_points) = @_;
+	
+	if ( ! defined $_points ) {
+		# Use all points in index if none were specified
+		my $key;
+		if (USE_NUMERIC_KEYS) {
+			if (USE_PACKED_KEYS) {
+				$key = pack("Q", ( MASK_LEVEL << 58 ) | ( MASK_LATLON << 29 ) | MASK_LATLON );
+			} else {
+				$key = ( MASK_LEVEL << 58 ) | ( MASK_LATLON << 29 ) | MASK_LATLON;
+			}
+		} else {
+			$key = [ ALL, ALL, ALL ];
+		}
+		$_points = $self->GetValue($key);
+		
+	} elsif ( ref $_points eq 'HASH' ) {
+		# Build list if passed a single point
+		$_points = [ $_points ];
+	}
+	
+	foreach my $_point ( @$_points ) {
+		delete $$_point{lat_rad};
+		delete $$_point{lon_rad};
+		delete $$_point{circumference};
+		delete $$_point{search_result_distance};
+		delete $$_point{antipode_distance};
+	}
 }
 
 
@@ -5186,20 +5460,37 @@ because, especially in the inner loops, speed has been favoured over clarity.
 
 =head3 Reporting bugs
 
-Please submit any bugs or feature requests either to C<bug-geo-index at rt.cpan.org> 
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Index>.  
-I will receive notification when you do and you will be automatically notified 
-of progress on your submission as it takes place.
+Please submit any bugs or feature requests either to C<bug-geo-index at rt.cpan.org>, 
+through L<CPAN's web interface|http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Index>,
+or through L<Github|https://github.com/Alex-Kent/Geo-Index/issues>.  In any case I will 
+receive notification when you do and you will be automatically notified of progress 
+on your submission as it takes place. Any other comments can be sent to C<akh@cpan.org>.
 
 =head1 VERSION HISTORY
+
+B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
+
+=over
+
+=item * B<C<Sweep(...)>>: New method
+
+=item * B<C<Vacuum(...)>>: New method
+
+=item * Added tests
+
+=item * B<C<SearchByBounds(...)>>: Bug fixes
+
+=item * B<C<new(...)>>: Added C<quiet> option
+
+=back
 
 B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
 
 =over
 
-=item * B<Index(...)>: Fixed bug for points added near (but not at) the north pole
+=item * B<C<Index(...)>>: Fixed bug for points added near (but not at) the north pole
 
-=item * B<GetConfiguration(...)>: Added supported_key_types, supported_code_types, and tile_meters values
+=item * B<C<GetConfiguration(...)>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values
 
 =back
 
