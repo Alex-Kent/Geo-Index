@@ -4742,7 +4742,8 @@ be changed by setting the appropriate value at the top of C<Geo/Index.pm>)
 =head2 Benchmark results
 
 Typical benchmark results run on a modern workstation using numeric keys and 
-double-precision C low-level code are as follows:
+double-precision C low-level code with the index containing 1,000,000 points 
+are as follows:
 
 =over
 
