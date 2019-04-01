@@ -1,12 +1,15 @@
 #!/usr/bin/perl
 
-$|=0; # Unbuffer STDOUT
+use strict;
+use warnings;
 
 use Geo::Index;
 
+sub LoadPoints();
+my $_results;
 
 
-print "\nLoading points\n";
+print "Loading points\n";
 
 my $_points = LoadPoints();
 
@@ -19,7 +22,7 @@ print "\nRunning normal search (1,000 km radius) around 10 points\n\n";
 
 srand 0;
 
-for ($i=0; $i<10; $i++) {
+for (my $i=0; $i<10; $i++) {
 	# Choose search point
 	my $_point = $$_points[rand(@$_points)];
 	print "\t$$_point{name}:\n";
@@ -40,7 +43,7 @@ print "\nRunning quick search (1,000 km radius) around the same 10 points\n\n";
 
 srand 0;
 
-for ($i=0; $i<10; $i++) {
+for (my $i=0; $i<10; $i++) {
 	# Choose search point
 	my $_point = $$_points[rand(@$_points)];
 	print "\t$$_point{name}:\n";
@@ -64,7 +67,7 @@ print "\n\n";
 print "\nFinding points within 3,000 km of the north pole\n\n";
 
 # Run search
-my $_results = $index->Search( [ 90, 0 ], { sort_results=>1, radius=>3_000_000 } );
+$_results = $index->Search( [ 90, 0 ], { sort_results=>1, radius=>3_000_000 } );
 
 # Display results
 foreach my $_point (@$_results) {
@@ -76,7 +79,7 @@ print "\n";
 print "\nFinding points within 3,000 km of the north pole (quick results)\n\n";
 
 # Run search
-my $_results = $index->Search( [ 90, 0 ], { quick_results=>1, radius=>3_000_000 } );
+$_results = $index->Search( [ 90, 0 ], { quick_results=>1, radius=>3_000_000 } );
 
 # Display results
 foreach my $_set (@$_results) {
@@ -93,7 +96,7 @@ print "\n";
 print "\nFinding points within 5,000 km of the south pole\n\n";
 
 # Run search
-my $_results = $index->Search( [ -90, 180 ], { sort_results=>1, radius=>5_000_000 } );
+$_results = $index->Search( [ -90, 180 ], { sort_results=>1, radius=>5_000_000 } );
 
 # Display results
 foreach my $_point (@$_results) {
@@ -105,7 +108,7 @@ print "\n";
 print "\nFinding points within 5,000 km of the south pole (quick results)\n\n";
 
 # Run search
-my $_results = $index->Search( [ -90, 180 ], { quick_results=>1, radius=>5_000_000 } );
+$_results = $index->Search( [ -90, 180 ], { quick_results=>1, radius=>5_000_000 } );
 
 # Display results
 foreach my $_set (@$_results) {
@@ -120,10 +123,26 @@ print "\n";
 
 
 
+use File::Spec;
+use File::Basename;
+use Cwd;
+
 sub LoadPoints() {
 	my @points = ();
 	
-	open IN, "cities.txt";
+	# Determine sample data's filename
+	my $file = File::Spec->catdir(
+	             File::Basename::dirname( Cwd::abs_path($0) ),
+	             'cities.txt'
+	           );
+	
+	unless ( -e $file ) {
+		print STDERR "Data file '$file' not found.\n";
+		exit;
+	}
+	
+	# Load the sample data
+	open IN, $file;
 	while (my $line = <IN>) {
 		chomp $line;
 		my ($country, $city, $lat, $lon) = split /\t/, $line;

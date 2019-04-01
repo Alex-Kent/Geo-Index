@@ -79,7 +79,7 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.1';
+$VERSION = 'v0.0.2';
 
 =head1 VERSION
 
@@ -426,8 +426,9 @@ B<Important: >The lines MUST appear in the order shown.
 #. The following variables hold the current state of the compiled code:
 
 my $C_CODE_COMPILED;      #. Set true if the C code was successfully compiled
-my $ACTIVE_CODE = undef;  #. Set to the type of code currently being used:
+my $ACTIVE_CODE = undef;  #. Set to the type of low-level code currently being used:
                           #. 'perl, 'double', or 'float' (the latter two being C)
+my @SUPPORTED_CODE = ( ); #. List of available low-level code types
 my $C_CODE_ACTIVE = 0;    #. Set true when compiled C code is being used
 
 sub new($;$$) {
@@ -512,7 +513,11 @@ sub new($;$$) {
 	#. If the code compiled and this is the first time new() is being called 
 	#. we'll start using the compiled code by default.
 	unless ( defined $ACTIVE_CODE ) {
+		push @SUPPORTED_CODE, 'perl';
+		
 		if ( $C_CODE_COMPILED) {
+			push @SUPPORTED_CODE, 'float';
+			push @SUPPORTED_CODE, 'double';
 			SetDistanceFunctionType('double');
 		} else {
 			SetDistanceFunctionType('perl');
@@ -717,6 +722,9 @@ sub Index($$) {
 		} elsif ( $lat_idx_0 >= $size_minus_one ) {
 			#. Near north pole
 			
+			# Clip value
+			$lat_idx_0 = $size_minus_one;
+			
 			if (USE_NUMERIC_KEYS) {
 				if (USE_PACKED_KEYS) {
 					$key = pack("Q", ( $grid_level << 58 ) | ( $lat_idx_0 << 29 ) | MASK_LATLON );
@@ -809,8 +817,6 @@ work.
 =cut
 
 
-
-use Data::Dumper();
 
 #. Delete specified point from index
 # Used by Index
@@ -3797,11 +3803,18 @@ sub SetDistanceFunctionType($) {
 }
 
 
-#. Returns the type of low-level functions that are active
+#. Returns the type of low-level functions that is active
 #. (one of 'perl', 'float', or 'double')
-# Not used internally
-sub GetDistanceFunctionType() {
+# used by GetConfiguration
+sub GetLowLevelCodeType() {
 	return $ACTIVE_CODE;
+}
+
+#. Returns reference to list of the supported low-level function types
+#. (list values as per GetLowLevelCodeType)
+# used by GetConfiguration
+sub GetSupportedLowLevelCodeTypes() {
+	return [ @SUPPORTED_CODE ];
 }
 
 #. Perl version of the distance functions
@@ -4228,6 +4241,14 @@ C<key_type> - The key type in use:
 
 =back
 
+C<supported_key_types> - The types of keys that can be used
+
+=over
+
+Value is a reference to a list of supported key types (as given above).
+
+=back
+
 C<code_type> - The type of low-level code in use:
 
 =over
@@ -4237,6 +4258,14 @@ C<code_type> - The type of low-level code in use:
 'C<float>' for C functions mostly using C<float> values.
 
 'C<double>' for C functions mostly using C<double> values.
+
+=back
+
+C<supported_code_types> - The types of low-level code that can be used
+
+=over
+
+Value is a reference to a list of supported code types (as given above).
 
 =back
 
@@ -4265,7 +4294,9 @@ sub GetConfiguration($) {
 	
 	#. Low-level configuration
 	$config{key_type}  = ( USE_NUMERIC_KEYS ) ? ( USE_PACKED_KEYS ) ? 'packed' : 'numeric' : 'text';
-	$config{code_type} = $self->GetDistanceFunctionType();
+	$config{supported_key_types} = [ 'text', 'numeric', 'packed' ];
+	$config{code_type} = $self->GetLowLevelCodeType();
+	$config{supported_code_types} = $self->GetSupportedLowLevelCodeTypes();
 	
 	#. Index depth
 	$config{levels}    = $self->{levels};
@@ -4329,7 +4360,7 @@ sub GetStatistics($) {
 	my @stats = ();
 	
 	foreach my $key (keys %$_index) {
-		my $level;
+		my ($level, $lat, $lon);
 		
 		if ( USE_NUMERIC_KEYS ) {
 			if ( USE_PACKED_KEYS ) {
@@ -4339,15 +4370,19 @@ sub GetStatistics($) {
 			#. numeric key
 			
 			$level = $key >> 58;
+			$lat   = ($key >> 29 ) & MASK_LATLON;
+			$lon   = $key & MASK_LATLON;
+			
+			$lat = 'ALL' if ($lat == MASK_LATLON);
+			$lon = 'ALL' if ($lon == MASK_LATLON);
 			
 			next if ($level > $levels);
 		} else {
 			#. text key
-			($level) = split /:/, $key;
+			($level,$lat,$lon) = split /[:,]/, $key;
 			
 			next if ($level eq 'ALL');
 		}
-		
 		
 		$stats[$level]->{level} = $level;
 		
@@ -4373,7 +4408,12 @@ sub GetStatistics($) {
 	}
 	
 	for (my $level=0; $level<$levels; $level++) {
-		$stats[$level]->{avg_tile_points} /= $stats[$level]->{tiles};
+		my $tiles = $stats[$level]->{tiles};
+		if ( $tiles ) {
+			$stats[$level]->{avg_tile_points} /= $tiles;
+		} else {
+			$stats[$level]->{avg_tile_points} = undef;
+		}
 	}
 	
 	return @stats;

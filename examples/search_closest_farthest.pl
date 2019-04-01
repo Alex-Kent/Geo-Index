@@ -1,15 +1,19 @@
 #!/usr/bin/perl
 
-$|=0; # Unbuffer STDOUT
+use strict;
+use warnings;
 
 use Geo::Index;
+
+sub LoadPoints();
+
 
 my $_points = LoadPoints();
 
 my $index = Geo::Index->new( { levels=>20 } );
 $index->IndexPoints( $_points );
 
-print "Benchmarking Search(...), Closest(...), and Farthest(...) for all points\n\n";
+print "Running Search(...), Closest(...), and Farthest(...) for all points\n\n";
 foreach my $point ( sort { $$a{name} cmp $$b{name} } @$_points ) {
 	my $_results;
 	
@@ -33,10 +37,27 @@ foreach my $point ( sort { $$a{name} cmp $$b{name} } @$_points ) {
 }
 
 
+
+use File::Spec;
+use File::Basename;
+use Cwd;
+
 sub LoadPoints() {
 	my @points = ();
 	
-	open IN, "cities.txt";
+	# Determine sample data's filename
+	my $file = File::Spec->catdir(
+	             File::Basename::dirname( Cwd::abs_path($0) ),
+	             'cities.txt'
+	           );
+	
+	unless ( -e $file ) {
+		print STDERR "Data file '$file' not found.\n";
+		exit;
+	}
+	
+	# Load the sample data
+	open IN, $file;
 	while (my $line = <IN>) {
 		chomp $line;
 		my ($country, $city, $lat, $lon) = split /\t/, $line;

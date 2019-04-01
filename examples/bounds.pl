@@ -1,8 +1,13 @@
 #!/usr/bin/perl
 
-$|=0; # Unbuffer STDOUT
+use strict;
+use warnings;
 
 use Geo::Index;
+
+sub LoadPoints();
+my $_results;
+
 
 my $_points = LoadPoints();
 
@@ -34,93 +39,127 @@ my %options;
 
 
 print "\tBad latitudes (will fail):\n";
-my $_results = $index->SearchByBounds( \%bad_lats, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%bad_lats, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
 }
 print "\n";
 
 
 
 print "\tOut of range (will fail):\n";
-my $_results = $index->SearchByBounds( \%out_of_range, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%out_of_range, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
 }
 print "\n";
 
 
 
 print "\tMax range (all points on globe):\n";
-my $_results = $index->SearchByBounds( \%max_range, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%max_range, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
 }
 print "\n";
 
 
 
 print "\tEurope:\n";
-my $_results = $index->SearchByBounds( \%europe, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%europe, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 print "\tCaribbean:\n";
-my $_results = $index->SearchByBounds( \%carribean, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%carribean, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 print "\tAfrica:\n";
-my $_results = $index->SearchByBounds( \%africa, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%africa, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 print "\tAustralia and New Zealand:\n";
-my $_results = $index->SearchByBounds( \%aus_nz, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%aus_nz, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 print "\tAntarctica:\n";
-my $_results = $index->SearchByBounds( \%antarctica, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%antarctica, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 print "\tArctic:\n";
-my $_results = $index->SearchByBounds( \%arctic, \%options );
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t\t$$p{name}\n";
+$_results = $index->SearchByBounds( \%arctic, \%options );
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t\t$$p{name}\n";
+	}
+	print "\n";
 }
-print "\n";
 
 
 
 
 
+
+use File::Spec;
+use File::Basename;
+use Cwd;
 
 sub LoadPoints() {
 	my @points = ();
 	
-	open IN, "cities.txt";
+	# Determine sample data's filename
+	my $file = File::Spec->catdir(
+	             File::Basename::dirname( Cwd::abs_path($0) ),
+	             'cities.txt'
+	           );
+	
+	unless ( -e $file ) {
+		print STDERR "Data file '$file' not found.\n";
+		exit;
+	}
+	
+	# Load the sample data
+	open IN, $file;
 	while (my $line = <IN>) {
 		chomp $line;
 		my ($country, $city, $lat, $lon) = split /\t/, $line;

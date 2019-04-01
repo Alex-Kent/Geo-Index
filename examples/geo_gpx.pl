@@ -3,8 +3,12 @@
 use Geo::Index;
 use Geo::Gpx;
 
+# Construct filename
+use File::Spec; use File::Basename; use Cwd;
+my $filename = File::Spec->catdir( File::Basename::dirname( Cwd::abs_path($0) ), 'cities.gpx' );
+
 # Load GPX file
-open $IN, "cities.gpx";
+open $IN, $filename;
 my $gpx = Geo::Gpx->new( input => $IN );
 close $IN;
 
