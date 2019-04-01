@@ -7,8 +7,6 @@ use Geo::Index;
 
 sub LoadPoints();
 
-use Data::Dumper;
-
 
 
 # Load sample points
@@ -78,9 +76,6 @@ foreach my $row ( @stats ) {
 	$$row{avg_tile_points} = 'unknown' unless ( defined $$row{avg_tile_points} );
 	printf( " %2i    %-8i   % -8i  %-8i  %-8i  %12.2f\n", $$row{level}, $$row{points}, $$row{tiles}, $$row{min_tile_points}, $$row{max_tile_points}, $$row{avg_tile_points} );
 }
-
-
-#print Dumper(\@stats);
 
 
 
