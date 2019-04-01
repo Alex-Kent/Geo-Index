@@ -10,8 +10,10 @@
 # script is run.
 
 # Important: The following line MUST appear before the "use Geo::Index;" line:
-
 use Inline(Config => DIRECTORY => '/tmp');
+
+# If running in taint mode (i.e. 'perl -T') then uncomment the following line:
+#use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
 
 
 # Load the module
