@@ -9,6 +9,7 @@ examples/inline_c_directory.pl
 examples/quick_results.pl
 examples/sample_benchmark.txt
 examples/search_closest_farthest.pl
+examples/show_configuration.pl
 ignore.txt
 lib/Geo/Index.pm
 LICENSE

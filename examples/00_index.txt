@@ -8,4 +8,4 @@ inline_c_directory.pl ....... Shows how to use an alternate directory for Inline
 quick_results.pl ............ Example comparing normal and quick searches
 sample_benchmark.txt ........ Sample output from benchmark.pl
 search_closest_farthest.pl .. Example comparing Search(...) to Closest() and Farthest()
-
+show_configuration.pl ....... Example of displaying an index's running configuration
