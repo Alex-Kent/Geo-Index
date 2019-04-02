@@ -430,7 +430,9 @@ B<Important: >The lines MUST appear in the order shown.
 
 Further discussion of this method can be found in the L<B<Inline> documentation|https://metacpan.org/pod/Inline#The-Inline-'directory'>.
 
-=head3 Taint
+=back
+
+B<Taint mode>
 
 If your program uses taint mode then you may encounter issues with this module's use of Inline::C.  There are three possible solutions to this:
 
@@ -475,8 +477,6 @@ Further discussion on using taint mode and Inline can be found on these external
 =item * L<Taint mode|https://perldoc.perl.org/perlsec.html#Taint-mode> in the B<perlsec> manpage
 
 =item * L<How do I use taint mode?|http://perlmeme.org/howtos/secure_code/taint.html> - A brief introduction
-
-=back
 
 =back
 
