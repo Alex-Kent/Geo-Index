@@ -23,10 +23,10 @@ my %config = $index->GetConfiguration();
 print "Running configuration:\n\n";
 
 # Custom labels for particular keys
-my %key_map = (
-                'size'        => 'Indexed points', 
-                'tile_meters' => 'Most-detailed tile size'
-              );
+my %labels = (
+               'size'        => 'Indexed points', 
+               'tile_meters' => 'Most-detailed tile size'
+             );
 
 # Loop through configuration keys in a set order...
 foreach my $key ( qw( levels size ), 
@@ -44,17 +44,20 @@ foreach my $key ( qw( levels size ),
 		print "\n";
 		next;
 	}
+	
+	# Skip keys that we've already displayed (or that don't exist in running configuration)
 	next unless (defined $config{$key});
 	
-	# Get value an remove entry from hash
+	# Get value and its remove entry from hash
 	my $value = $config{$key};
 	delete $config{$key};
 	
 	# Pretty print the key
-	my $label = ( defined $key_map{$key} ) ? $key_map{$key} : ucfirst $key;
+	my $label = ( defined $labels{$key} ) ? $labels{$key} : ucfirst $key;
 	$label =~ s/_/ /g;
 	
 	# Clean up value (when applicable)
+	
 	if ( $key eq 'tile_meters' ) {
 		$value = ( $value > 100.0 )
 		       ? int $value
