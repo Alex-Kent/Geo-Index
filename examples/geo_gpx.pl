@@ -29,7 +29,9 @@ print "Points in Central America:\n";
 my $_results = $index->SearchByBounds( \%central_america, \%options );
 
 # Display points in region
-foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
-	print "\t$$p{name}\n";
+if (defined $_results) {
+	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
+		print "\t$$p{name}\n";
+	}
 }
 print "\n";
