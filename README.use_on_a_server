@@ -40,8 +40,8 @@ for your environment.  The following should appear near the top of your script:
 
 An example of doing this can be found in 'examples/inline_c_directory.pl'
 
-Important: The specified directory must exist and be writeable before the script
-           is run.
+Important: The specified directory must exist and be writeable before the 
+           script is run.
 
 Important: The lines MUST appear in the order shown.
 
@@ -69,8 +69,8 @@ use of Inline::C.  There are three possible solutions to this:
     Subsequent invocations should work fine with taint mode on.
 
   o Allow Inline to untaint things
-    This method is quite effective but could be a potential security risk.  If 
-    asked,  Per the documentation, Inline will "blindly [untaint] fields in both 
+    This method is quite effective but could be a potential security risk.  Per 
+    the documentation, if asked Inline will "blindly [untaint] fields in both 
     %ENV and Inline objects" thus allowing Inline::C code to compile and run 
     under taint mode.  Needless to say if you are using taint mode in production 
     you should think carefully before doing this.  To activate this method, 
