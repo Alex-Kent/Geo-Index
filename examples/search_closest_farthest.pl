@@ -28,13 +28,13 @@ foreach my $point ( sort { $$a{name} cmp $$b{name} } @$_points ) {
 	#
 	# The search parameters are:
 	#
-	#     sort_results=>1
+	#     sort_results => 1
 	#     Sort results by their distance from the search point
 	#
-	#     max_results=>0, 
+	#     max_results => 0, 
 	#     Return an unlimited number of points (i.e. all points in index)
 	#
-	#     radius=>Geo::Index::ALL, 
+	#     radius => Geo::Index::ALL, 
 	#     Search is world-wide (normally this option's value would be the search radius in meters)
 	#
 	#     pre_condition=>sub { my ($rp, $sp, $d)=@_; return ($rp!=$sp); }
