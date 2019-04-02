@@ -428,6 +428,55 @@ is run.
 
 B<Important: >The lines MUST appear in the order shown.
 
+Further discussion of this method can be found in the L<B<Inline> documentation|https://metacpan.org/pod/Inline#The-Inline-'directory'>.
+
+=head3 Taint
+
+If your program uses taint mode then you may encounter issues with this module's use of Inline::C.  There are three possible solutions to this:
+
+=over
+
+=item * B<Don't use taint mode>
+
+This  may not be an option for you but is mentioned for completeness.
+To disable taint mode remove the `-T` flag from your invocation of Perl.
+For example, use C<#!/usr/bin/perl> instead of C<#!/usr/bin/perl -T>
+
+=item * B<Pre-build the C code>
+
+This method is similar to that descibed earlier.  When initially invoking Perl be sure to run C<perl SCRIPT.pl> instead of 
+C<perl -T SCRIPT.pl> (where C<SCRIPT.pl> is your program that normally runs under taint mode).  Subsequent invocations 
+should work fine with taint mode on.
+
+=item * B<Allow Inline to untaint things>
+
+This method is quite effective but could be a potential security risk.  If asked,  Inline will 
+L<"blindly [untaint] fields in both C<%ENV> and Inline objects|https://metacpan.org/pod/Inline#untaint> thus allowing 
+Inline::C code to compile and run under taint mode.  Needless to say if you are using taint mode in production you 
+should think carefully before doing this.  To activate this method, Geo::Index should be included in your Perl 
+script as follows:
+        
+    use Inline(Config => DIRECTORY => '/tmp');
+    use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
+    use Geo::Index;
+
+(Adjust C</tmp> to your liking.)
+
+=back
+
+Further discussion on using taint mode and Inline can be found on these external pages:
+
+=over
+
+=item * L<How do I use Inline with mod_perl?|https://metacpan.org/pod/distribution/Inline-C/lib/Inline/C/Cookbook.pod#mod_perl> in the B<Inline::C Cookbook>
+
+=item * L<C<untaint>|https://metacpan.org/pod/Inline#untaint> in the B<Inline> documentation
+
+=item * L<Taint mode|https://perldoc.perl.org/perlsec.html#Taint-mode> in the B<perlsec> manpage
+
+=item * L<How do I use taint mode?|http://perlmeme.org/howtos/secure_code/taint.html> - A brief introduction
+
+=back
 
 =back
 

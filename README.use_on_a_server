@@ -44,3 +44,54 @@ Important: The specified directory must exist and be writeable before the script
            is run.
 
 Important: The lines MUST appear in the order shown.
+
+
+Further discussion of this method can be found in the Inline documentation:
+    https://metacpan.org/pod/Inline#The-Inline-'directory
+
+
+
+Taint mode
+--------------------------------------------------------------------------------
+
+If your program uses taint mode then you may encounter issues with this module's 
+use of Inline::C.  There are three possible solutions to this:
+
+  o Don't use taint mode
+    This  may not be an option for you but is mentioned for completeness.
+    To disable taint mode remove the '-T' flag from your invocation of Perl.
+    For example, use '#!/usr/bin/perl' instead of '#!/usr/bin/perl -T'
+
+  o Pre-build the C code
+    This method is similar to that descibed earlier.  When initially invoking 
+    Perl be sure to run 'perl SCRIPT.pl' instead of 'perl -T SCRIPT.pl' (where 
+    'SCRIPT.pl' is your program that normally runs under taint mode).  
+    Subsequent invocations should work fine with taint mode on.
+
+  o Allow Inline to untaint things
+    This method is quite effective but could be a potential security risk.  If 
+    asked,  Per the documentation, Inline will "blindly [untaint] fields in both 
+    %ENV and Inline objects" thus allowing Inline::C code to compile and run 
+    under taint mode.  Needless to say if you are using taint mode in production 
+    you should think carefully before doing this.  To activate this method, 
+    Geo::Index should be included in your Perl script as follows:
+
+        use Inline(Config => DIRECTORY => '/tmp');
+        use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
+        use Geo::Index;
+
+    (Adjust '/tmp' to your liking.)
+
+Further discussion on using taint mode and Inline can be found on these pages:
+
+  o "How do I use Inline with mod_perl?" in the Inline::C Cookbook
+    https://metacpan.org/pod/distribution/Inline-C/lib/Inline/C/Cookbook.pod#mod_perl
+
+  o "untaint" in the Inline documentation
+    https://metacpan.org/pod/Inline#untaint
+
+  o "Taint mode" in the perlsec manpage
+    https://perldoc.perl.org/perlsec.html#Taint-mode
+
+  o "How do I use taint mode? - A brief introduction
+    http://perlmeme.org/howtos/secure_code/taint.html
