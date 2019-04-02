@@ -40,11 +40,15 @@ for (my $i=0; $i<10; $i++) {
 	
 	# Display results
 	
-	# Loop through the results...
-	foreach my $p1 (@$_results) {
-		# We're looking at a single point
-		# Display its name and distance
-		printf("\t\t$$p1{name}: %i km\n", int($$p1{search_result_distance} / 1000));
+	if (defined $_results) {
+		# We got results
+		
+		# Loop through the results...
+		foreach my $p1 (@$_results) {
+			# We're looking at a single point
+			# Display its name and distance
+			printf("\t\t$$p1{name}: %i km\n", int($$p1{search_result_distance} / 1000));
+		}
 	}
 	
 	print "\n";
@@ -105,8 +109,10 @@ print "\nFinding points within 3,000 km of the north pole\n\n";
 $_results = $index->Search( [ 90, 0 ], { sort_results=>1, radius=>3_000_000 } );
 
 # Display results
-foreach my $_point (@$_results) {
-	printf("\t$$_point{name}: %i km\n", int($$_point{search_result_distance} / 1000));
+if (defined $_results) {
+	foreach my $_point (@$_results) {
+		printf("\t$$_point{name}: %i km\n", int($$_point{search_result_distance} / 1000));
+	}
 }
 print "\n";
 
@@ -134,8 +140,10 @@ print "\nFinding points within 5,000 km of the south pole\n\n";
 $_results = $index->Search( [ -90, 180 ], { sort_results=>1, radius=>5_000_000 } );
 
 # Display results
-foreach my $_point (@$_results) {
-	printf("\t$$_point{name}: %i km\n", int($$_point{search_result_distance} / 1000));
+if (defined $_results) {
+	foreach my $_point (@$_results) {
+		printf("\t$$_point{name}: %i km\n", int($$_point{search_result_distance} / 1000));
+	}
 }
 print "\n";
 

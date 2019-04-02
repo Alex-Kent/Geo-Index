@@ -184,6 +184,7 @@ sub LoadPoints() {
 	
 	# Loop through the file's lines...
 	while (my $line = <IN>) {
+		
 		# Remove trailine newline
 		chomp $line;
 		
@@ -200,7 +201,10 @@ sub LoadPoints() {
 		# Note that this is a 'proper' point, namely a hash with 
 		# entries for 'lat' and 'lon'.
 		push @points, { lat=>$lat, lon=>$lon, name=>($city) ? "$city, $country" : $country };
+		
 	}
+	
+	# Close the data file
 	close IN;
 	
 	return \@points;
