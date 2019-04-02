@@ -52,7 +52,7 @@ if (defined $_results) {
 	# We got results
 	
 	# Sort the returned points by name
-	# and loop through them
+	# and loop through them...
 	foreach my $p (sort { $$a{name} cmp $$b{name} } @$_results) {
 		# We're looking at a single point($p) 
 		# that matched our search query.
