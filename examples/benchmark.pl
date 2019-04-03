@@ -119,6 +119,8 @@ my $radius = 10_000;  # value is in meters
 
 
 
+print "\nThis benchmark will likely take about 8 minutes to run\n\n";
+
 $FUNCTION_TYPE = 'float' unless ($FUNCTION_TYPE);
 
 use warnings;
