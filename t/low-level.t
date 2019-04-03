@@ -35,8 +35,7 @@ SKIP: {
 		skip "Couldn't determine available low-level code types", test_count - 2;
 		
 	} elsif ( scalar(@$_types) == 1 ) {
-		warn "Warning: Accelerated C code not available, problem with Inline::C?";
-		skip "Accelerated C code not available", test_count - 2;
+		skip "Accelerated C code not available", test_count - 3;
 	}
 	
 	my @points = (

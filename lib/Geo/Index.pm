@@ -97,6 +97,46 @@ $VERSION = 'v0.0.3';
 
 This document describes Geo::Index version 0.0.3
 
+=cut
+
+
+
+
+#. Attempt to load C low-level code library
+
+
+#. The C code is located in Index.xs is the code's root directory
+
+
+#. Boilerplate for compiled code
+require Exporter;
+*import = \&Exporter::import;
+require DynaLoader;
+sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
+
+#. Attempt to load the C low-level code library
+eval { DynaLoader::bootstrap Geo::Index $VERSION; };
+
+#. Note whether C low-level code library is available
+my $C_CODE_COMPILED; 
+if ($@) {
+	$C_CODE_COMPILED = 0;
+} else {
+	$C_CODE_COMPILED = 1;
+}
+	
+#. Choose which C function to export
+@Geo::Index::EXPORT = ();
+#@Geo::Index::EXPORT_OK = qw(
+#    GetCCodeVersion fast_log2_double fast_log2_float ComputeAreaExtrema_float 
+#    ComputeAreaExtrema_double ComputeAreaExtrema_double SetUpDistance_float HaversineDistance_float 
+#    SetUpDistance_double SetUpDistance_double HaversineDistance_double 
+#    );
+@Geo::Index::EXPORT_OK = qw();
+
+
+
+
 =head1 SYNOPSIS
 
   # Create and populate a geographic index
@@ -322,7 +362,7 @@ B<C<levels>>
 
 =over
 
-Depth of index.  S<(valid: E<gt>0, E<lt>30; default: 20)>
+Depth of index.  S<(valid: E<gt>0, E<lt>31; default: 20)>
 
 Note that the C<levels> parameter specifies the number of non-full-globe index 
 levels to generate and NOT the deepest index level.  (Level -1, covering the 
@@ -398,7 +438,6 @@ Geo::Index uses Inline::C to compile code.
 #. Geo::Index uses C code to speed up distance computations.
 #. The following variables hold the current state of the compiled code:
 
-my $C_CODE_COMPILED;      #. Set true if the C code was successfully compiled
 my $ACTIVE_CODE = undef;  #. Set to the type of low-level code currently being used:
                           #. 'perl, 'double', or 'float' (the latter two being C)
 my @SUPPORTED_CODE = ( ); #. List of available low-level code types
@@ -472,7 +511,13 @@ sub new($;$$) {
 	#. Depth of index
 	$self->{levels} = 20;  #. ~40 m grid size at most detailed level of index
 	if (ref $_options eq 'HASH') {
-		$self->{levels} = $_options->{levels} if ($_options->{levels});
+		$self->{levels} = int $_options->{levels} if ($_options->{levels});
+	}
+	#.Clip value
+	if ($self->{levels} > 30) {
+		$self->{levels} = 30;
+	} elsif ($self->{levels} < 1) {
+		$self->{levels} = 1;
 	}
 	
 	#. Number of grid tiles in each direction at most detailed level of index
@@ -3923,340 +3968,6 @@ sub HaversineDistance($$) {
 }
 
 
-#. C functions used to accelerate distance calculations
-#. 
-#. The C versions are up to 30% faster than the equivalent Perl code
-
-
-BEGIN {
-	$C_CODE_COMPILED = 0;
-	
-	eval {
-		require Inline;
-		Inline->import(C => Config => LIBS => '-lm');      # This really isn't required
-		#Inline->import(C => Config => BUILD_NOISY => 1);  # Uncomment to always see build details
-		Inline->import(C => q {
-
-/* Start of C code */
-
-// This code requires at least a C99 compiler (for uint_* types and // comments)
-
-/*
-   All functions below come in two versions, one using single-precision (float) 
-   math and variables and the other using double-precision (double) math and 
-   variables.  Functionally, the two versions of each function are identical.
-*/
-
-unsigned int fast_log2_double(double n) {
-	return ceil( log2(n) );
-}
-
-unsigned int fast_log2_float(float n) {
-	return ceilf( log2f(n) );
-}
-
-
-#define PI 3.14159265358979
-#define DEG2RAD (PI / 180.0) *
-#define RAD2DEG (180.0 / PI) *
-
-/*
-This code accelerates the set-up code in the Search(...) method.  Functionally it is identical to the Perl version.
-Called as ( $grid_level, $grid_size, $max_grid_idx, $lat_0_idx, $lat_1_idx, $lon_0_idx, $lon_1_idx ) = ComputeAreaExtrema( $tile_adjust, $max_size, $max_level, $p_lat, $p_lat_rad, $p_lon, $self->{polar_circumference}, $search_radius );
-*/
-
-void ComputeAreaExtrema_float( int tile_adjust, unsigned long max_size, unsigned int max_level, float p_lat, float p_lat_rad, float p_lon, float polar_circumference, float search_radius ) {
-	Inline_Stack_Vars;  /* For return values */
-	
-	uint_fast8_t  grid_level   = 0;
-	uint_fast32_t grid_size    = 0;
-	uint_fast32_t max_grid_idx = 0;
-	
-	// Determine grid level to search at
-	
-	// Size of most detailed grid tile at this point (in meters)
-	float ns_indexed_meters = ( polar_circumference / 2.0 ) / max_size; // Dividing by two to get pole-to-pole distance
-	
-	uint_fast8_t shift = fast_log2_float( search_radius / ns_indexed_meters );
-	
-	shift += tile_adjust;
-	
-	//  Make sure the shift we computed lies within the index levels
-	if (shift < 0) {
-		shift = 0;
-	} else if (shift >= max_level) {
-		shift = max_level - 1;
-	}
-	
-	//  Shift is relative to the highest-resolution zoom level
-	//  Determine grid level to use
-	grid_level = max_level - shift;
-	
-	grid_size = 1 << (grid_level+1);
-	max_grid_idx = grid_size - 1;
-	
-	//  Determine which grid tiles need to be checked
-	
-	//  Get search point's grid indices
-	
-	float lat_meter_in_degrees = 360.0 / polar_circumference;
-	
-	float lat_radius = search_radius * lat_meter_in_degrees;
-	float lat_radius_rad = DEG2RAD( lat_radius );
-	float lon_radius = RAD2DEG( atan2f( sinf(lat_radius_rad), cosf(lat_radius_rad) * cosf(p_lat_rad) ) );
-	
-	float lat_0 = p_lat - lat_radius;
-	float lat_1 = p_lat + lat_radius;
-	
-	float lon_0 = p_lon - lon_radius;
-	float lon_1 = p_lon + lon_radius;
-	
-	
-	if (lat_0 <= -90) {
-		lat_0 = -90;
-	}
-	
-	if (lat_1 >= 90) {
-		lat_1 = 90;
-	}
-	
-	if      ( lon_0 < -180.0 ) { lon_0 += 360.0; }
-	else if ( lon_0 > 180.0 )  { lon_0 -= 360.0; }
-	
-	if      ( lon_1 < -180.0 ) { lon_1 += 360.0; }
-	else if ( lon_1 > 180.0 )  { lon_1 -= 360.0; }
-	
-	if      ( lat_0 < -90.0 ) { lat_0 = -90.0; }
-	else if ( lat_0 >  90.0 ) { lat_0 =  90.0; }
-	
-	if      ( lat_1 < -90.0 ) { lat_1 = -90.0; }
-	else if ( lat_1 >  90.0 ) { lat_1 =  90.0; }
-	
-	uint_fast32_t lat_0_idx = (uint_fast32_t)( ( lat_0 + 90.0 )  * max_size / 180.0 );
-	if (lat_0_idx >= max_size) lat_0_idx = max_size - 1;
-	lat_0_idx >>= shift;
-	
-	uint_fast32_t lat_1_idx = (uint_fast32_t)( ( lat_1 + 90.0 )  * max_size / 180.0 );
-	if (lat_1_idx >= max_size) lat_1_idx = max_size - 1;
-	lat_1_idx >>= shift;
-	
-	uint_fast32_t lon_0_idx = ( (uint_fast32_t)( ( lon_0 + 180.0 ) * max_size / 360.0 ) % max_size ) >> shift;
-	
-	uint_fast32_t lon_1_idx = ( (uint_fast32_t)( ( lon_1 + 180.0 ) * max_size / 360.0 ) % max_size ) >> shift;
-	
-	if (lat_0_idx > lat_1_idx) {
-		uint_fast32_t tmp = lat_1_idx;
-		lat_1_idx = lat_0_idx;
-		lat_0_idx = tmp;
-	}
-	
-	/* Populate return values (all unsigned integers) */
-	
-	Inline_Stack_Reset;
-	Inline_Stack_Push(sv_2mortal(newSVuv( grid_level )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( grid_size )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( max_grid_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lat_0_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lat_1_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lon_0_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lon_1_idx )));
-	Inline_Stack_Done;
-}
-
-
-void ComputeAreaExtrema_double( int tile_adjust, unsigned long max_size, unsigned int max_level, double p_lat, double p_lat_rad, double p_lon, double polar_circumference, double search_radius ) {
-	Inline_Stack_Vars;  /* For return values */
-	
-	uint_fast8_t  grid_level   = 0;
-	uint_fast32_t grid_size    = 0;
-	uint_fast32_t max_grid_idx = 0;
-	
-	// Determine grid level to search at
-	
-	// Size of most detailed grid tile at this point (in meters)
-	double ns_indexed_meters = ( polar_circumference / 2.0 ) / max_size; // Dividing by two to get pole-to-pole distance
-	
-	uint_fast8_t shift = fast_log2_double( search_radius / ns_indexed_meters );
-	
-	shift += tile_adjust;
-	
-	//  Make sure the shift we computed lies within the index levels
-	if (shift < 0) {
-		shift = 0;
-	} else if (shift >= max_level) {	
-		shift = max_level - 1;
-	}
-	
-	//  Shift is relative to the highest-resolution zoom level
-	//  Determine grid level to use
-	grid_level = max_level - shift;
-	
-	grid_size = 1 << (grid_level+1);
-	max_grid_idx = grid_size - 1;
-	
-	//  Determine which grid tiles need to be checked
-	
-	//  Get search point's grid indices
-	
-	double lat_meter_in_degrees = 360.0 / polar_circumference;
-	
-	double lat_radius = search_radius * lat_meter_in_degrees;
-	double lat_radius_rad = DEG2RAD( lat_radius );
-	double lon_radius = RAD2DEG( atan2( sin(lat_radius_rad), cos(lat_radius_rad) * cos(p_lat_rad) ) );
-	
-	double lat_0 = p_lat - lat_radius;
-	double lat_1 = p_lat + lat_radius;
-	
-	double lon_0 = p_lon - lon_radius;
-	double lon_1 = p_lon + lon_radius;
-	
-	
-	if (lat_0 <= -90) {
-		lat_0 = -90;
-	}
-	
-	if (lat_1 >= 90) {
-		lat_1 = 90;
-	}
-	
-	if      ( lon_0 < -180.0 ) { lon_0 += 360.0; }
-	else if ( lon_0 > 180.0 )  { lon_0 -= 360.0; }
-	
-	if      ( lon_1 < -180.0 ) { lon_1 += 360.0; }
-	else if ( lon_1 > 180.0 )  { lon_1 -= 360.0; }
-	
-	if      ( lat_0 < -90.0 ) { lat_0 = -90.0; }
-	else if ( lat_0 >  90.0 ) { lat_0 =  90.0; }
-	
-	if      ( lat_1 < -90.0 ) { lat_1 = -90.0; }
-	else if ( lat_1 >  90.0 ) { lat_1 =  90.0; }
-	
-	uint_fast32_t lat_0_idx = (uint_fast32_t)( ( lat_0 + 90.0 )  * max_size / 180.0 );
-	if (lat_0_idx >= max_size) lat_0_idx = max_size - 1;
-	lat_0_idx >>= shift;
-	
-	uint_fast32_t lat_1_idx = (uint_fast32_t)( ( lat_1 + 90.0 )  * max_size / 180.0 );
-	if (lat_1_idx >= max_size) lat_1_idx = max_size - 1;
-	lat_1_idx >>= shift;
-	
-	uint_fast32_t lon_0_idx = ( (uint_fast32_t)( ( lon_0 + 180.0 ) * max_size / 360.0 ) % max_size ) >> shift;
-	
-	uint_fast32_t lon_1_idx = ( (uint_fast32_t)( ( lon_1 + 180.0 ) * max_size / 360.0 ) % max_size ) >> shift;
-	
-	if (lat_0_idx > lat_1_idx) {
-		uint_fast32_t tmp = lat_1_idx;
-		lat_1_idx = lat_0_idx;
-		lat_0_idx = tmp;
-	}
-	
-	/* Populate return values (all unsigned integers) */
-	
-	Inline_Stack_Reset;
-	Inline_Stack_Push(sv_2mortal(newSVuv( grid_level )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( grid_size )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( max_grid_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lat_0_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lat_1_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lon_0_idx )));
-	Inline_Stack_Push(sv_2mortal(newSVuv( lon_1_idx )));
-	Inline_Stack_Done;
-}
-
-
-
-
-/*
-   Compute distance between two points on a sphere
-   
-   diameter is in meters
-   lat_0, lon_0, lat_1, and lon_1 are in radians
-   Distance returned is in meters
-   
-   To compute a distance first call SetUpDistance(...) with the first point 
-   then call HaversineDistance(...) to get the distance to a second point.
-   
-   The C version can use either floats or doubles whereas Perl uses doubles.  
-   When using floats instead of doubles the loss of precision is typically less 
-   than a meter (about 2 meters in the worst case).   On modern hardware there 
-   should be little noticable difference between using floats and doubles.  On 
-   older hardware or in embedded systems floats may give better performance.
-*/
-
-
-/* Functions using floats */
-
-float f_diameter, f_lat_1, f_lon_1;
-float f_cos_lat_1;
-
-void SetUpDistance_float(float new_diameter, float new_lat_1, float new_lon_1) {
-	f_diameter = new_diameter;
-	f_lat_1 = new_lat_1;
-	f_lon_1 = new_lon_1;
-	f_cos_lat_1 = cosf( new_lat_1 );
-}
-
-float HaversineDistance_float(float lat_0, float lon_0) {
-	float sin_lat_diff_over_2 = sinf( ( lat_0 - f_lat_1 ) / 2.0 );
-	float sin_lon_diff_over_2 = sinf( ( lon_0 - f_lon_1 ) / 2.0 );
-	
-	float n = ( sin_lat_diff_over_2 * sin_lat_diff_over_2 ) 
-	          + (
-	              ( sin_lon_diff_over_2 * sin_lon_diff_over_2 )
-	              * f_cos_lat_1
-	              * cosf( lat_0 )
-	            );
-	
-	/* The haversine formula may get messy around antipodal points so clip to the largest sane value. */
-	if ( n < 0.0 ) { n = 0.0; }
-	
-	return f_diameter  * asinf( sqrtf(n) );
-}
-
-
-
-/* Functions using doubles */
-
-double d_diameter, d_lat_1, d_lon_1;
-double d_cos_lat_1;
-
-void SetUpDistance_double(double new_diameter, double new_lat_1, double new_lon_1) {
-	d_diameter = new_diameter;
-	d_lat_1 = new_lat_1;
-	d_lon_1 = new_lon_1;
-	d_cos_lat_1 = cos( new_lat_1 );
-}
-
-double HaversineDistance_double(double lat_0, double lon_0) {
-	double sin_lat_diff_over_2 = sin( ( lat_0 - d_lat_1 ) / 2.0 );
-	double sin_lon_diff_over_2 = sin( ( lon_0 - d_lon_1 ) / 2.0 );
-	
-	double n = ( sin_lat_diff_over_2 * sin_lat_diff_over_2 ) 
-	          + (
-	              ( sin_lon_diff_over_2 * sin_lon_diff_over_2 )
-	              * d_cos_lat_1
-	              * cos( lat_0 )
-	            );
-	
-	/* The haversine formula may get messy around antipodal points so clip to the largest sane value. */
-	if ( n < 0.0 ) { n = 0.0; }
-	
-	return d_diameter  * asin( sqrt(n) );
-}
-
-/* End of C code */
-
-});
-		$C_CODE_COMPILED = 1;
-	} or print STDERR "Inline::C error: $@\nBuilding C functions failed.  Using Perl fallback instead.\n";
-	
-	# At this point if the code compiled $C_CODE_COMPILED will be true.
-}
-
-
-
-
-
-
 
 
 =head2 GetConfiguration( )
@@ -4342,6 +4053,24 @@ sub GetConfiguration($) {
 	$config{supported_key_types} = [ 'text', 'numeric', 'packed' ];
 	$config{code_type} = $self->GetLowLevelCodeType();
 	$config{supported_code_types} = $self->GetSupportedLowLevelCodeTypes();
+	
+	$config{module_version} = "$VERSION";
+	$config{module_version} =~ s/^v//;
+	
+	if ($C_CODE_COMPILED == 1) {
+		#. C low-level function library is loaded
+		
+		my $c_code_version = Geo::Index::GetCCodeVersion();
+		my $mask = ( 1 << 10 ) - 1;
+		my $major_version = ( $c_code_version >> 20 ) & $mask;
+		my $minor_version = ( $c_code_version >> 10 ) & $mask;
+		my $sub_version   =   $c_code_version         & $mask;
+		$config{c_code_version} = "${major_version}.${minor_version}.${sub_version}";
+		
+	} else {
+		#. No C low-level function library
+		$config{c_code_version} = undef;
+	}
 	
 	#. Index depth
 	$config{levels}    = $self->{levels};
