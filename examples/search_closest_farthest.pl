@@ -72,7 +72,7 @@ foreach my $point ( sort { $$a{name} cmp $$b{name} } @$_points ) {
 
 
 
-# Core Perl modules, use to build the filename
+# Core Perl modules, used to build the filename
 use File::Spec;
 use File::Basename;
 use Cwd;
