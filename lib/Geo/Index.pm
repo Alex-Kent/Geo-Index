@@ -99,7 +99,7 @@ $VERSION = 'v0.0.3';
 
 =head1 Version
 
-This document describes Geo::Index version 0.1.0
+This document describes Geo::Index version 0.0.3
 
 =head1 Synopsis
 
