@@ -88,7 +88,7 @@ use constant ALL => -1;
 
 Section: User Contributed Perl Documentation (3)
 
-=head1 NAME
+=head1 Name
 
 Geo::Index - Geographic indexer
 
@@ -97,24 +97,24 @@ Geo::Index - Geographic indexer
 use vars qw ($VERSION);
 $VERSION = 'v0.0.3';
 
-=head1 VERSION
+=head1 Version
 
 This document describes Geo::Index version 0.1.0
 
-=head1 SYNOPSIS
+=head1 Synopsis
 
   # Create and populate a geographic index
   
   use Geo::Index;
   
-  my @points = (
-                 { lat =>   1.0, lon =>   2.0 },
-                 { lat => -90.0, lon =>   0.0, name => 'South Pole' },
-                 { lat =>  30.0, lon => -20.0, ele => 123.4 }
-               );
-  my $point = { lat=>10.0, lon=>20.0 };
+  @points = (
+              { lat =>   1.0, lon =>   2.0 },
+              { lat => -90.0, lon =>   0.0, name => 'South Pole' },
+              { lat =>  30.0, lon => -20.0, ele => 123.4 }
+            );
+  $point = { lat=>10.0, lon=>20.0 };
   
-  my $index = Geo::Index->new();
+  $index = Geo::Index->new();
   $index->IndexPoints( \@points );
   $index->Index( $point );
   $index->Index( [ 30, 40 ] );
@@ -122,58 +122,60 @@ This document describes Geo::Index version 0.1.0
   
   # Search index
   
-  my %search_options = ( sort_results => 1, radius=>5_000_000 );
-  my $results = $index->Search( [ -80, 20 ], \%search_options );
+  %search_options = ( sort_results => 1, radius=>5_000_000 );
+  $results = $index->Search( [ -80, 20 ], \%search_options );
   print "$$results[0]{name}\n";  # Prints 'South Pole'
   
   # Get all points in the southern hemisphere
-  my $results = $index->SearchByBounds( [ -180, -90, 180, 0 ] );
+  $results = $index->SearchByBounds( [ -180, -90, 180, 0 ] );
   print "$$results[0]{name}\n";  # Also prints 'South Pole'
   
-  my ($closest) = $index->Closest( [ -80, 20 ] );
+  ($closest) = $index->Closest( [ -80, 20 ] );
   print "$$closest{name}\n";     # Also prints 'South Pole'
   
-  my ($farthest) = $index->Farthest( [ 90, 0 ] );
-  print "$$farthest{name}\n";    # Also prints 'South Pole'
+  ($closest) = $index->Closest( $points[1], { post_condition=>'NONE' } );
+  print "$$closest{name}\n";     # Also prints 'South Pole'
   
+  ($farthest) = $index->Farthest( [ 90, 0 ] );
+  print "$$farthest{name}\n";    # Also prints 'South Pole'
   
   # Compute distance in meters between two points (using haversine formula)
   
-  my $m = $index->Distance( { lat=>51.507222, lon=>-0.1275 }, [ -6.2, 106.816667 ] );
+  $m = $index->Distance( { lat=>51.507222, lon=>-0.1275 }, [ -6.2, 106.816667 ] );
   printf("London to Jakarta: %i km\n", $m / 1000);
   
   $index->DistanceFrom( [ 90, 0 ] );
-  my $m = $index->DistanceTo( $points[1] );
+  $m = $index->DistanceTo( $points[1] );
   printf("Pole to pole:      %i km\n", $m / 1000);
   
-=head1 DESCRIPTION
+=head1 Description
 
 Geo::Index is a Perl module for creating in-memory geographic points indices. 
 Once points have been indexed, fast searches can be run.  
 
-Efficient searches methods include B<C<Search(...)>> to get all points 
-within a distance from a given point, B<C<SearchByBounds(...)>> to get all 
-points in an given area, B<C<Closest(...)>> to get the closest points to a 
-given point, and B<C<Farthest(...)>> to get the farthest points from a given 
+Efficient searches methods include B<C<L<Search(...)|/Search(_..._)>>> to get all points 
+within a distance from a given point, B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>> to get all 
+points in an given area, B<C<L<Closest(...)|/Closest(_..._)>>> to get the closest points to a 
+given point, and B<C<L<Farthest(...)|/Farthest(_..._)>>> to get the farthest points from a given 
 point.
 
 Additional methods are provided to compute distances between arbitrary points 
-(E<nbsp>B<C<Distance(...)>>, B<C<DistanceFrom(...)>>, and B<C<DistanceTo(...)>>E<nbsp>)
+(E<nbsp>B<C<L<Distance(...)|/Distance(_..._)>>>, B<C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>>, and B<C<L<DistanceTo(...)|/DistanceTo(_..._)>>>E<nbsp>)
 and to get the size in meters of one degree or the size in degrees of one meter
-at a given point (B<C<OneDegreeInMeters(...)>> and B<C<OneMeterInDegrees(...)>>, 
+at a given point (B<C<L<OneDegreeInMeters(...)|/OneDegreeInMeters(_..._)>>> and B<C<L<OneMeterInDegrees(...)|/OneMeterInDegrees(_..._)>>>, 
 respectively).
 
 While by default computations are done for the Earth, other bodies can be used 
-by supplying appropriates radii and circumferences to B<C<new(...)>>.
+by supplying appropriates radii and circumferences to B<C<L<new(...)|/Geo::Index-E<gt>new( ... )>>>.
 
-=head1 POINTS
+=head1 Points
 
 Geo::Index works with points on a spherical body.  Points are hash references 
 containing, at a minimum, C<lat> and C<lon> entries which give the point's 
 position in degrees.  Additional hash entries can be present and will be both 
-ignored and preserved.  The C<Index(...)>, C<IndexPoints(...)>,  
-C<Search(...)>, C<Closest(...)>, C<Farthest(...)>, 
-C<Distance(...)>, C<DistanceFrom(...)>, and C<DistanceTo(...)> 
+ignored and preserved.  The C<L<Index(...)|/Index(_..._)>>, C<L<IndexPoints(...)|/IndexPoints(_..._)>>,  
+C<L<Search(...)|/Search(_..._)>>, C<L<Closest(...)|/Closest(_..._)>>, C<L<Farthest(...)|/Farthest(_..._)>>, 
+C<L<Distance(...)|/Distance(_..._)>>, C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>, and C<L<DistanceTo(...)|/DistanceTo(_..._)>> 
 methods add additional entries in point hashes.
 
 The hash entries used by Geo::Gpx are shown below.  Apart from C<lat> and C<lon> 
@@ -183,41 +185,41 @@ should not be set, altered, or deleted.
 =over
 
 =item *
-C<lat> - Point's latitude in degrees [ -90 .. 90 ]
+B<C<lat>> - Point's latitude in degrees [ -90 .. 90 ]
 
 =item *
-C<lon> - Point longitude in degrees [ -180 .. 180 )
+B<C<lon>> - Point longitude in degrees [ -180 .. 180 )
 
 These two values may be changed but the altered point should then be re-indexed 
-using C<Index(...)> before further searches are run.
+using C<L<Index(...)|/Index(_..._)>> before further searches are run.
 
 =item *
-C<data> - The optional user data supplied when a point was created 
+B<C<data>> - The optional user data supplied when a point was created 
 using the array shorthand.  This contents of this field may be freely modified 
-by the user.  See C<Index(...)> and C<IndexPoints(...)>, below.
+by the user.  See C<L<Index(...)|/Index(_..._)>> and C<L<IndexPoints(...)|/IndexPoints(_..._)>>, below.
 
 =item *
-C<lat_rad> - The point's latitude in radians [ -pi/2 .. pi/2 ]
+B<C<lat_rad>> - The point's latitude in radians [ -pi/2 .. pi/2 ]
 
 =item *
-C<lon_rad> - The point's longitude in radians [ -pi .. pi )
+B<C<lon_rad>> - The point's longitude in radians [ -pi .. pi )
 
 =item *
-C<circumference> - Circumference (in meters) of the circle of latitude 
+B<C<circumference>> - Circumference (in meters) of the circle of latitude 
 that the point falls on.  This is computed from the body's equatorial 
 circumference assuming a spherical (not an oblate) body.
 
 =item *
-C<search_result_distance> - Distance (in meters) of point from search 
+B<C<search_result_distance>> - Distance (in meters) of point from search 
 point of previous search.  The distance computation assumes a spherical body 
 and is computed using a ruggedized version of the haversine formula.  This 
-value is only generated when C<Search(...)> is called with the C<radius> 
-or C<sort_results> option.  See also C<Distance(...)>, C<DistanceFrom(...)>, 
-and C<DistanceTo(...)>.
+value is only generated when C<L<Search(...)|/Search(_..._)>> is called with the C<radius> 
+or C<sort_results> option.  See also C<L<Distance(...)|/Distance(_..._)>>, C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>, 
+and C<L<DistanceTo(...)|/DistanceTo(_..._)>>.
 
 =item *
-C<antipode_distance> - Distance (in meters) of point from search 
-point's antipode as determined by a previous call to C<Farthest(...)>.
+B<C<antipode_distance>> - Distance (in meters) of point from search 
+point's antipode as determined by a previous call to C<L<Farthest(...)|/Farthest(_..._)>>.
 This distance is computed using a ruggedized version of the haversine formula.
 
 =back
@@ -231,9 +233,9 @@ original array.  To access the data field of a point created using the shorthand
 notation use C<$$point{'data'}> where C<$point> is a search result point.
 
 Any fields added to the indexed points by Geo::Index can be removed using 
-Sweep(...) and Vacuum(...).
+C<L<Sweep(...)|/Sweep(_..._)>> and C<L<Vacuum(...)|/Vacuum(_..._)>>.
 
-=head1 METHODS
+=head1 Methods
 
 =cut
 
@@ -388,98 +390,6 @@ inherent in the haversine function that is used for distance calculations.
 
 Geo::Index uses Inline::C to compile code.
 
-If you are running in a server environment and want to use the accelerated C 
-functions but do not want Inline::C to be able to write files to your script's 
-working directory then there are two options available:
-
-=over
-
-=item * B<Pre-build the C code>
-
-To do this log in to the server as yourself (or another user as appropriate) 
-then C<cd> to the script's working directory.  Next, run the following command:
-
- perl -e "use Geo::Index;"
-
-The C code should automatically be compiled and stored in the C<_Inline> 
-subdirectory.  Once this has been done, change permissions and/or ownership of 
-the C<_Inline> subdirectory and its contents to suit your liking.  A simple 
-S<C<chmod -w -R _Inline>> might suffice.
-
-=item * B<Specify a build and library directory>
-
-If you want to use the compiled C functions but don't want the build to be done 
-in the current directory, you can specify an alternate build and library 
-directory here.  The example below creates C<build> and C<lib> directories along 
-with a C<config> file in C</tmp/>.  For your own scripts, change C</tmp> as 
-appropriate for your environment.  The following should appear near the top of 
-your script:
-
-    # Specify the build and library directory
-    use Inline(Config => DIRECTORY => '/tmp');
-    
-    # Load the module
-    use Geo::Index;
-
-An example of doing this can be found in C<examples/inline_c_directory.pl>
-
-B<Important: >The specified directory must exist and be writeable before the script 
-is run.
-
-B<Important: >The lines MUST appear in the order shown.
-
-Further discussion of this method can be found in the L<B<Inline> documentation|https://metacpan.org/pod/Inline#The-Inline-'directory'>.
-
-=back
-
-B<Taint mode>
-
-If your program uses taint mode then you may encounter issues with this module's use of Inline::C.  There are three possible solutions to this:
-
-=over
-
-=item * B<Don't use taint mode>
-
-This  may not be an option for you but is mentioned for completeness.
-To disable taint mode remove the `-T` flag from your invocation of Perl.
-For example, use C<#!/usr/bin/perl> instead of C<#!/usr/bin/perl -T>
-
-=item * B<Pre-build the C code>
-
-This method is similar to that descibed earlier.  When initially invoking Perl be sure to run C<perl SCRIPT.pl> instead of 
-C<perl -T SCRIPT.pl> (where C<SCRIPT.pl> is your program that normally runs under taint mode).  Subsequent invocations 
-should work fine with taint mode on.
-
-=item * B<Allow Inline to untaint things>
-
-This method is quite effective but could be a potential security risk.  If asked,  Inline will 
-L<"blindly [untaint] fields in both C<%ENV> and Inline objects|https://metacpan.org/pod/Inline#untaint> thus allowing 
-Inline::C code to compile and run under taint mode.  Needless to say if you are using taint mode in production you 
-should think carefully before doing this.  To activate this method, Geo::Index should be included in your Perl 
-script as follows:
-        
-    use Inline(Config => DIRECTORY => '/tmp');
-    use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
-    use Geo::Index;
-
-(Adjust C</tmp> to your liking.)
-
-=back
-
-Further discussion on using taint mode and Inline can be found on these external pages:
-
-=over
-
-=item * L<How do I use Inline with mod_perl?|https://metacpan.org/pod/distribution/Inline-C/lib/Inline/C/Cookbook.pod#mod_perl> in the B<Inline::C Cookbook>
-
-=item * L<C<untaint>|https://metacpan.org/pod/Inline#untaint> in the B<Inline> documentation
-
-=item * L<Taint mode|https://perldoc.perl.org/perlsec.html#Taint-mode> in the B<perlsec> manpage
-
-=item * L<How do I use taint mode?|http://perlmeme.org/howtos/secure_code/taint.html> - A brief introduction
-
-=back
-
 =back
 
 =back
@@ -630,7 +540,7 @@ The points to add to the index
 
 Each point in the list is either a reference to a hash containing at a minimum 
 a C<lat> and a C<lon> value (both in degrees) or a reference to an array 
-giving the point.  See the B<POINTS> section above for details.
+giving the point.  See the B<L<POINTS|/POINTS>> section above for details.
 
 =back
 
@@ -681,6 +591,8 @@ sub BuildPoints($) {
 	return ( wantarray ) ? @out : \@out;
 }
 
+
+
 =head2 Index( ... )
 
 =over
@@ -702,7 +614,7 @@ B<C<%point>> or B<C<@point>>
 The point to add to the index
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<POINTS> section above 
+(both in degrees) or an array giving the point.  See the B<L<POINTS|/POINTS>> section above 
 for details.
 
 =back
@@ -710,7 +622,6 @@ for details.
 =back
 
 =cut
-
 
 
 sub Index($$) {
@@ -886,7 +797,6 @@ work.
 =cut
 
 
-
 #. Delete specified point from index
 # Used by Index
 sub DeletePointIndex($$) {
@@ -1029,7 +939,7 @@ The point to search near
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<POINTS> section above for details.
+See the B<L<POINTS|/POINTS>> section above for details.
 
 =back
 
@@ -1086,7 +996,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See below for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -1100,7 +1010,7 @@ should be included in the results.
 This code is run after the distance from the search point to the result point 
 has been calculated.
 
-See below for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -1112,7 +1022,7 @@ Arbitrary user-supplied data that is passed to the condition functions.
 
 This can be used to allow the function access to additional data structures.
 
-See below for syntax,
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -1137,7 +1047,7 @@ search radius will likely be returned as well.
 When iterating over the arrays be sure to check whether a list element is C<undef> 
 before trying to deference it.
 
-An example of returned quick results (in scalar context); POINTs are references 
+An example of returned quick results (in scalar context); B<L<POINTs|/POINTS>> are references 
 to different points:
 
 C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
@@ -1145,7 +1055,7 @@ C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
 To be clear, when this option is active rough radius limiting is done but there 
 is no filtering done, no distances are computed, and no sorting is performed.
 
-See the B<PERFORMANCE> section below for a discussion of this option and when 
+See the B<L<Performance|/Performance>> section below for a discussion of this option and when 
 to S<use it>.
 
 =back
@@ -1195,91 +1105,9 @@ active.
 
 =back
 
-B<Using user-supplied condition functions>
-
-=over
-
-If present, these functions are called for each potential search result.  They 
-should be idempotent* and could potentially be called multiple times for a given 
-point.  The code should return TRUE (e.g. C<1>) if a potential point should be 
-included in the results or FALSE (e.g. C<0> or C<undef>) if the point should 
-be excluded.  The C<pre_condition> function runs before the distance to the 
-result point has been calculated and the C<post_condition> function runs after 
-it has been calculated.
-
-* Functions can set outside values provided they do not affect any values 
-used internally by C<Seach(...)> and so long as these outside values have 
-no effect on the condition's outcome.  Such behavior is, of course, frowned upon.
-
-The parameters to the condition function are, in order:
-
-=over
-
-B<C<$_result_point>>
-
-=over
-
-Reference to the potential search result being checked
-
-=back
-
-B<C<$_search_point>>
-
-=over
-
-Reference to the point at the center of the search
-
-For C<SearchByBounds(...)> this is instead the bounding box:
-S<C<[ I<west>, I<south>, I<east>, I<north> ]>>
-
-=back
-
-B<C<$user_data>>
-
-=over
-
-Arbitrary user-supplied data
-
-=back
-
-=back
-
-For example, the options set in the following code allows all points in the 
-results except for the one named 'S<Point Nada>':
-
- $options{pre_condition} = 
-     sub {
-           my ( $_result_point, $_search_point, $user_data ) = @_;
-           if ( $$_result_point{name} eq $user_data ) {
-             return 0;  # Exclude result
-           }
-           return 1;    # Point is a valid search result
-         };
- $options{user_data} = "Point Nada";
-
-To exclude the search point from the search results use:
-
- $options{post_condition} = 
-     sub {
-           my ( $_result_point, $_search_point, $user_data ) = @_;
-           return ( $_result_point != $_search_point );
-         };
-
-or more concisely
-
- $options{post_condition} = sub { return $_[0] != $_[1]; };
-
-In general, C<post_condition> functions should be preferred since the overhead 
-of the Perl function call is typically larger than that of the distance 
-calculation.  By checking the distance first, running the C<post_condition> 
-function might not be necessary.
-
-=back
-
 =back
 
 =cut
-
 
 
 sub Search($$;$) {
@@ -1961,7 +1789,9 @@ Search index for points within a given bounding box
 
 The points returned are those that lie between the specified latitudes and 
 longitudes.  The four corners form a rectangle only when using certain map 
-projections such as equirectangular or mercator (including pseudo-mercator 
+projections such as L<equirectangular|https://en.wikipedia.org/wiki/Equirectangular_projection> 
+or L<mercator|https://en.wikipedia.org/wiki/Mercator_projection> 
+(including L<pseudo-mercator|https://en.wikipedia.org/wiki/Web_Mercator_projection> 
 a.k.a. web mercator as used by slippy maps).  If you are using a projection 
 that does not have horizontal lines of latitude and vertical lines of longitude 
 and you want the results to lie within and/or fill a rectangle on your map then 
@@ -2029,7 +1859,7 @@ condition function is a reference to the bounding box in list form (as described
 above for C<@bounds>).  Lastly, since "distance from search point" makes no 
 sense in the context of a bounding box, none is provided to the function.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -2041,7 +1871,7 @@ Arbitrary user-supplied data that is passed to the condition function.
 
 This can be used to allow the function access to additional data structures.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -2074,8 +1904,8 @@ C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
 To be clear, when this option is active rough bounds limiting is done but there 
 is no filtering done and no bound checks are actually performed.
 
-See the B<PERFORMANCE> section below for a discussion of this option and when 
-to S<use it>.
+See the B<L<Performance|/Performance>> section below for a discussion of this 
+option and when to use it.
 
 =back
 
@@ -2234,7 +2064,7 @@ sub SearchByBounds($$;$) {
 	                                                  #. a larger number of tiles that need to be processed.  This can slow things down 
 	                                                  #. under some circumstances.  Similarly using larger tiles results in more points 
 	                                                  #. spread over fewer tiles.   What adjustment (if any) will result in the highest 
-	                                                  #. performance is highly dependant on both the search radius and on the number    
+	                                                  #. performance is highly dependent on both the search radius and on the number    
 	                                                  #. and distribution of the indexed points.  If you adjust this value be sure to   
 	                                                  #. benchmark your application using a real dataset and the parameters (both       
 	                                                  #. typical and worst-case) that you expect to use.                          
@@ -2758,8 +2588,8 @@ C<$results_ref = $index-E<gt>Closest( \%point, $number_of_points_desired, \%opti
 Find the point or points closest to a given point
 
 Note that if you want to find the closest points within a given radius it may be 
-faster to use C<Search(...)> instead.  See the B<PERFORMANCE> section for 
-more details.
+faster to use C<L<Search(...)|/Search(_..._)>> instead.  See the B<L<Performance|/Performance>> 
+section below for more details.
 
 B<C<%point>>
 
@@ -2769,7 +2599,7 @@ The point to search near
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<POINTS> section above for details.
+See the B<L<Points|/Points>> section above for details.
 
 =back
 
@@ -2827,7 +2657,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -2845,7 +2675,7 @@ By default, a C<post_condition> function that filters out the search point
 is used.  To remove this default function either specify a new one or set 
 C<post_condition> to "C<NONE>".
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -2857,7 +2687,7 @@ Arbitrary user-supplied data that is passed to the condition functions.
 
 This can be used to allow the function access to additional data structures.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -2889,6 +2719,12 @@ hash.  It can be retrieved using e.g. S<C<$meters = $$point{search_result_distan
 
 sub Closest($$;$$) {
 	my ($self, $_search_point, $number_of_points_desired, $_options) = @_;
+	
+	# Allow calling as Closest( POINT, OPTIONS ) when only a single point is desired.
+	if (ref $number_of_points_desired) {
+		$_options = $number_of_points_desired;
+		$number_of_points_desired = 1;
+	}
 	
 	#. Get the point index
 	my $_points = $$self{index};
@@ -3499,7 +3335,7 @@ The point to search relative to
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<POINTS> section above for details.
+See the B<L<Points|/Points>> section above for details.
 
 =back
 
@@ -3557,7 +3393,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -3575,7 +3411,7 @@ By default, a C<post_condition> function that filters out the search point is
 used.  To remove this default function either specify a new one, set a value for 
 C<user_data>, or set C<post_condition> to "C<NONE>".
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -3591,7 +3427,7 @@ If the default C<post_condition> is active and no C<user_data> value has been
 provided by the caller then this is set to the actual (non-antipodal) search 
 point.
 
-See B<Using user-supplied condition functions> above for syntax.
+See the B<L<Condition functions|/Condition functions>> section below for syntax.
 
 =back
 
@@ -3611,7 +3447,7 @@ For each point in the results the distance in meters from it to the search point
 will be stored in the C<search_result_distance> entry in the result point's 
 hash.  In addition, the distance from a result point to the search point's 
 antipode will be stored in the C<antipode_distance> entry.  These can be 
-retreived using e.g.:
+retrieved using e.g.:
 
   $meters_from_search_point  = $$point{search_result_distance};
   $meters_to_antipodal_point = $$point{antipode_distance};
@@ -3628,6 +3464,12 @@ retreived using e.g.:
 
 sub Farthest($$;$$) {
 	my ($self, $_search_point, $number_of_points_desired, $_options) = @_;
+	
+	# Allow calling as Farthest( POINT, OPTIONS ) when only a single point is desired.
+	if (ref $number_of_points_desired) {
+		$_options = $number_of_points_desired;
+		$number_of_points_desired = 1;
+	}
 	
 	#. Get the point index
 	my $_points = $$self{index};
@@ -3776,8 +3618,8 @@ B<C<%point_1>> or B<C<@point_1>>, B<C<%point_2>> or B<C<@point_2>>
 The points to measure the distance between
 
 These can be either hashes containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or arrays giving each point.  See the B<POINTS> section above 
-for details.
+(both in degrees) or arrays giving each point.  See the B<L<Points|/Points>> 
+section above for details.
 
 =back
 
@@ -3807,9 +3649,9 @@ C<$meters = $index-E<gt>DistanceFrom( \@point_1 );>
 
 Set an initial point to measure distances from
 
-Note that any call to C<Distance(...)> and some calls to C<Search(...)> 
-(those using the C<radius> or C<sort_results> options) will overwrite the 
-initial point set with this method.
+Note that any call to C<L<Distance(...)|/Distance(_..._)>> and some calls to 
+C<L<Search(...)|/Search(_..._)>> (those using the C<radius> or C<sort_results> 
+options) will overwrite the initial point set with this method.
 
 B<C<%point_1>> or B<C<@point_1>>
 
@@ -3818,8 +3660,9 @@ B<C<%point_1>> or B<C<@point_1>>
 The point to measure distances from
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<POINTS> section above 
-for details.
+(both in degrees) or an array giving the point.  See the B<L<Points|/Points>> 
+section above for details.
+
 
 =back
 
@@ -3856,7 +3699,7 @@ C<$meters = $index-E<gt>DistanceTo( \%point_2 );>
 C<$meters = $index-E<gt>DistanceTo( \@point_2 );>
 
 Returns the distance in meters between the specified point and the one set 
-earlier with C<DistanceFrom(...)>.
+earlier with C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>.
 
 The haversine function is used to compute the distance.  As this assumes a 
 spherical body the distances returned may show errors.  Using the default 
@@ -3870,8 +3713,8 @@ B<C<%point_2>> or B<C<@point_2>>
 The point to measure distances to
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<POINTS> section above 
-for details.
+(both in degrees) or an array giving the point.  See the B<L<Points|/Points>> 
+section above for details.
 
 =back
 
@@ -4432,7 +4275,7 @@ The return value is a hash with the following entries:
 
 =over
 
-C<key_type> - The key type in use:
+B<C<key_type>> - The key type in use:
 
 =over
 
@@ -4444,7 +4287,7 @@ C<key_type> - The key type in use:
 
 =back
 
-C<supported_key_types> - The types of keys that can be used
+B<C<supported_key_types>> - The types of keys that can be used
 
 =over
 
@@ -4452,7 +4295,7 @@ Value is a reference to a list of supported key types (as given above).
 
 =back
 
-C<code_type> - The type of low-level code in use:
+B<C<code_type>> - The type of low-level code in use:
 
 =over
 
@@ -4464,7 +4307,7 @@ C<code_type> - The type of low-level code in use:
 
 =back
 
-C<supported_code_types> - The types of low-level code that can be used
+B<C<supported_code_types>> - The types of low-level code that can be used
 
 =over
 
@@ -4472,17 +4315,17 @@ Value is a reference to a list of supported code types (as given above).
 
 =back
 
-C<levels> - Number of levels in index (excluding the global level)
+B<C<levels>> - Number of levels in index (excluding the global level)
 	
-C<planetary_radius> - Average planetary radius (in meters)
+B<C<planetary_radius>> - Average planetary radius (in meters)
 
-C<polar_circumference> - Polar circumference (in meters)
+B<C<polar_circumference>> - Polar circumference (in meters)
 
-C<equatorial_circumference> - Equatorial circumference (in meters)
+B<C<equatorial_circumference>> - Equatorial circumference (in meters)
 	
-C<size> - Number of points currently indexed
+B<C<size>> - Number of points currently indexed
 
-C<tile_meters> - Size in meters (at the equator) of each tile the at 
+B<C<tile_meters>> - Size in meters (at the equator) of each tile the at 
 most-detailed level of index
 
 =back
@@ -4538,17 +4381,17 @@ following entries:
 
 =over
 
-C<level> - The level number the statistics are for
+B<C<level>> - The level number the statistics are for
 
-C<points> - Total number of points indexed in this level
+B<C<points>> - Total number of points indexed in this level
 
-C<tiles> - Number of tiles containing at least one point
+B<C<tiles>> - Number of tiles containing at least one point
 
-C<min_tile_points> - Minimum number of points in a non-empty tile
+B<C<min_tile_points>> - Minimum number of points in a non-empty tile
 
-C<max_tile_points> - Maximum number of points in a non-empty tile
+B<C<max_tile_points>> - Maximum number of points in a non-empty tile
 
-C<avg_tile_points> - Average number of points in a non-empty tile
+B<C<avg_tile_points>> - Average number of points in a non-empty tile
 
 =back
 
@@ -4648,7 +4491,7 @@ The fields that will be removed are C<search_result_distance> and C<antipode_dis
 Called on its own (with no point or points specified) this method will remove 
 data generated by searches from all points.
 
-See also C<Vacuum(...)>.
+See also C<L<Vacuum(...)|/Vacuum(_..._)>>.
 
 B<C<%point>> or B<C<@points>>
 
@@ -4714,7 +4557,7 @@ C<search_result_distance>, C<antipode_distance>.
 Called on its own (with no point or points specified) this method will remove 
 all generated data from all points.
 
-See also C<Sweep(...)>.
+See also C<L<Sweep(...)|/Sweep(_..._)>>.
 
 B<C<%point>> or B<C<@points>>
 
@@ -4858,6 +4701,44 @@ sub LongitudeCircumference($$) {
 }
 
 
+=head2 OneMeterInDegrees( ... )
+
+=over
+
+C<$index-E<gt>OneMeterInDegrees( $latitude );>
+
+Returns length in degrees of one meter (N/S and E/W) at given latitude
+
+Values are approximate.  The diameters are those for an oblate spheroid but 
+the math assumes a sphere.  As one approaches the poles these values get 
+heavily distorted; code that uses them needs to take this into account.
+
+See also C<L<OneDegreeInMeters(...)|/OneDegreeInMeters(_..._)>>.
+
+B<C<$latitude>>
+
+=over
+
+The latitude in radians
+
+=back
+
+B<Return value>
+
+=over
+
+An two-element list containing the width and height in meters of one degree 
+at the given latitude:
+
+C<( I<degrees_of_latitude>, I<degrees_of_longitude> )>
+
+=back
+
+=back
+
+=cut
+
+
 #: Returns length in degrees of one meter (N/S and E/W) at given latitude
 #. 
 #> IN:  latitude -> The latitude in radians
@@ -4882,6 +4763,44 @@ sub OneMeterInDegrees($$) {
 		return ( ( 360.0 / $NS_circumference_in_meters ), undef )
 	}
 }
+
+
+=head2 OneDegreeInMeters( ... )
+
+=over
+
+C<$index-E<gt>OneMeterInDegrees( $latitude );>
+
+Returns length in meters of one degree (N/S and E/W) at given latitude
+
+Values are approximate.  The diameters are those for an oblate spheroid but 
+the math assumes a sphere.  As one approaches the poles these values get 
+heavily distorted; code that uses them needs to take this into account.
+
+See also C<L<OneMeterInDegrees(...)|/OneMeterInDegrees(_..._)>>.
+
+B<C<$latitude>>
+
+=over
+
+The latitude in radians
+
+=back
+
+B<Return value>
+
+=over
+
+An two-element list containing the width and height in degrees of one meter 
+at the given latitude:
+
+C<( I<north_south_meters>, I<east_west_meters> )>
+
+=back
+
+=back
+
+=cut
 
 
 #: Returns length in meters of one degree (N/S and E/W) at given latitude
@@ -4931,7 +4850,193 @@ sub GetIndices($$$) {
 
 
 
-=head1 PERFORMANCE
+=head1 Condition functions
+
+The C<L<Search(...)|/Search(_..._)>>, C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>, 
+C<L<Closest(...)|/Closest(_..._)>>, and C<L<Farthest(...)|/Farthest(_..._)>> 
+methods allow a user-supplied condition function to filter potential results.
+
+If present, these condition functions are called for each potential search 
+result.  They should be idempotent* and could potentially be called multiple 
+times for a given point.  The code should return B<TRUE> (e.g. C<1>) if a potential 
+point should be included in the results or B<FALSE> (e.g. C<0> or C<undef>) if the 
+point should be excluded.
+
+For C<L<Search(...)|/Search(_..._)>>, C<L<Closest(...)|/Closest(_..._)>>, and 
+C<L<Farthest(...)|/Farthest(_..._)>>, the C<pre_condition> function runs before 
+the distance to the result point has been calculated and the C<post_condition> 
+function runs after it has been calculated. For C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> 
+no distances are calculated and the function is simply called once per point.
+
+* Functions can set outside values provided they do not affect any values 
+used internally by C<L<Search(...)|/Search(_..._)>> and so long as those 
+outside values have no effect on the condition's outcome.  Such behavior is, 
+of course, frowned upon.
+
+The parameters to the condition function are, in order:
+
+=over
+
+B<C<$_result_point>>
+
+=over
+
+Reference to the potential search result being checked
+
+=back
+
+B<C<$_search_point>>
+
+=over
+
+Reference to the point at the center of the search
+
+For C<SearchByBounds(...)> this is instead the bounding box:
+S<C<[ I<west>, I<south>, I<east>, I<north> ]>>
+
+=back
+
+B<C<$user_data>>
+
+=over
+
+Arbitrary user-supplied data
+
+=back
+
+=back
+
+For example, the options set in the following code allows all points in the 
+results except for the one named 'S<Point Nada>':
+
+    $options{pre_condition} = 
+        sub {
+              my ( $_result_point, $_search_point, $user_data ) = @_;
+              if ( $$_result_point{name} eq $user_data ) {
+                return 0;  # Exclude result
+              }
+              return 1;    # Point is a valid search result
+            };
+    $options{user_data} = "Point Nada";
+
+To exclude the search point from the search results use:
+
+    $options{post_condition} = 
+        sub {
+              my ( $_result_point, $_search_point, $user_data ) = @_;
+              return ( $_result_point != $_search_point );
+            };
+
+or more concisely
+
+    $options{post_condition} = sub { return $_[0] != $_[1]; };
+
+In general, C<post_condition> functions should be preferred since the overhead 
+of the Perl function call is typically larger than that of the distance 
+calculation.  By checking the distance first, running the C<post_condition> 
+function might not be necessary.
+
+
+
+
+=head1 Running on a server
+
+If you are running in a server environment and want to use the accelerated C 
+functions but do not want Inline::C to be able to write files to your script's 
+working directory then there are two options available:
+
+=over
+
+=item * B<Pre-build the C code>
+
+To do this log in to the server as yourself (or another user as appropriate) 
+then C<cd> to the script's working directory.  Next, run the following command:
+
+ perl -e "use Geo::Index;"
+
+The C code should automatically be compiled and stored in the C<_Inline> 
+subdirectory.  Once this has been done, change permissions and/or ownership of 
+the C<_Inline> subdirectory and its contents to suit your liking.  A simple 
+S<C<chmod -w -R _Inline>> might suffice.
+
+=item * B<Specify a build and library directory>
+
+If you want to use the compiled C functions but don't want the build to be done 
+in the current directory, you can specify an alternate build and library 
+directory here.  The example below creates C<build> and C<lib> directories along 
+with a C<config> file in C</tmp/>.  For your own scripts, change C</tmp> as 
+appropriate for your environment.  The following should appear near the top of 
+your script:
+
+    # Specify the build and library directory
+    use Inline(Config => DIRECTORY => '/tmp');
+    
+    # Load the module
+    use Geo::Index;
+
+An example of doing this can be found in C<examples/inline_c_directory.pl>
+
+B<Important: >The specified directory must exist and be writeable before the script 
+is run.
+
+B<Important: >The lines MUST appear in the order shown.
+
+Further discussion of this method can be found in the L<B<Inline> documentation|https://metacpan.org/pod/Inline#The-Inline-'directory'>.
+
+=back
+
+B<Taint mode>
+
+If your program uses taint mode then you may encounter issues with this module's use of Inline::C.  There are three possible solutions to this:
+
+=over
+
+=item * B<Don't use taint mode>
+
+This  may not be an option for you but is mentioned for completeness.
+To disable taint mode remove the `-T` flag from your invocation of Perl.
+For example, use C<#!/usr/bin/perl> instead of C<#!/usr/bin/perl -T>
+
+=item * B<Pre-build the C code>
+
+This method is similar to that descibed earlier.  When initially invoking Perl be sure to run C<perl SCRIPT.pl> instead of 
+C<perl -T SCRIPT.pl> (where C<SCRIPT.pl> is your program that normally runs under taint mode).  Subsequent invocations 
+should work fine with taint mode on.
+
+=item * B<Allow Inline to untaint things>
+
+This method is quite effective but could be a potential security risk.  If asked,  Inline will 
+L<"blindly [untaint] fields in both C<%ENV> and Inline objects|https://metacpan.org/pod/Inline#untaint> thus allowing 
+Inline::C code to compile and run under taint mode.  Needless to say if you are using taint mode in production you 
+should think carefully before doing this.  To activate this method, Geo::Index should be included in your Perl 
+script as follows:
+        
+    use Inline(Config => DIRECTORY => '/tmp');
+    use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
+    use Geo::Index;
+
+(Adjust C</tmp> to your liking.)
+
+=back
+
+Further discussion on using taint mode and Inline can be found on these external pages:
+
+=over
+
+=item * L<How do I use Inline with mod_perl?|https://metacpan.org/pod/distribution/Inline-C/lib/Inline/C/Cookbook.pod#mod_perl> in the B<Inline::C Cookbook>
+
+=item * L<C<untaint>|https://metacpan.org/pod/Inline#untaint> in the B<Inline> documentation
+
+=item * L<Taint mode|https://perldoc.perl.org/perlsec.html#Taint-mode> in the B<perlsec> manpage
+
+=item * L<How do I use taint mode?|http://perlmeme.org/howtos/secure_code/taint.html> - A brief introduction
+
+=back
+
+
+
+
+=head1 Performance
 
 =head2 Overview
 
@@ -4942,7 +5047,7 @@ than a linear search.  For larger datasets and for applications running in a
 server environment using something like PostGIS is more appropriate.
 
 Indexing speed is about 50,000 points per second when C<levels> is 20.  Search 
-speeds are highly dependant on the data indexed and on search parameters but are 
+speeds are highly dependent on the data indexed and on search parameters but are 
 typically in the neighborhood of a few thousand searches per second.
 
 Memory usage tends to be rather high; for 1,000,000 points the index is S<~3.2 GB> 
@@ -4988,18 +5093,18 @@ is faster than
 
 =item * B<Choose an appropriate value for C<levels> when creating the index>
 
-The C<Search(...)> method has best performance when the size of the most 
+The C<L<Search(...)|/Search(_..._)>> method has best performance when the size of the most 
 detailed level of the index has a smaller physical size than the radius of a 
 typical search.  For example, if your searches are typically for points within 
 100 meters then an index with C<levels> should be set to at least 18 (~75 meters 
 at the equator) to yield best results; if typical searches have 10 meter radius 
 then C<levels> should be 22.
 
-The C<Closest(...)> method works best when the most detailed level of the 
+The C<L<Closest(...)|/Closest(_..._)>> method works best when the most detailed level of the 
 index contains a single point per tile and search points lie close to potential 
 result points.
 
-To help tune the C<levels> value, the C<GetConfiguration(...)> method can 
+To help tune the C<levels> value, the C<L<GetConfiguration( )|/GetConfiguration( )>> method can 
 be used to find out the physical size of the most detailed level along with 
 statistics on the number of points per index tile.
 
@@ -5011,15 +5116,15 @@ those matching the search criteria.  An example of this is drawing points on
 a map; if points are clipped to the visible area when they are 
 drawn it may not matter if some of them lie outside of it.
 
-=item * B<Use C<Search(...)> instead of C<Closest(...)> when you have a search radius.>
+=item * B<Use C<L<Search(...)|/Search(_..._)>> instead of C<L<Closest(...)|/Closest(_..._)>> when you have a search radius.>
 
-The C<Closest(...)> function is most efficient when no search radius is 
+The C<L<Closest(...)|/Closest(_..._)>> function is most efficient when no search radius is 
 specified or when result points lie very close to the search point.  Closeness 
 is relative to the tile size of the most detailed index level; for the default 
 index depth (C<20>), "very close" is roughly within about 100 meters.
 
 When clipping results to a maximal radius it is typically much faster to use 
-C<Search(...)> with the C<sort_results> and C<max_results> options*.
+C<L<Search(...)|/Search(_..._)>> with the C<sort_results> and C<max_results> options*.
 
 For example, to find the closest C<$n> points within distance C<$d> of a point 
 C<$p> it is usually much faster to use
@@ -5051,20 +5156,20 @@ the results and is needed to fully emulate the behavior of C<Closest(...)>.
 
 =head2 Technical discussion
 
-Both C<Search(...)> and C<SearchByBounds(...)> are very fast since 
+Both C<L<Search(...)|/Search(_..._)>> and C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> are very fast since 
 they can find the relevant index tiles in linear time.  Since the time needed to 
-filter the results is directly proportional to the number of points retreived 
+filter the results is directly proportional to the number of points retrieved 
 from the index, best performance occurs when the size of the most detailed tiles 
 is smaller than that of the typical search radius or search bounds.
 
-Searches run using C<Closest(...)> are done starting from the most 
+Searches run using C<L<Closest(...)|/Closest(_..._)>> are done starting from the most 
 detailed level and work upwards.  Best performance occurs when a result is found 
 in the first few iterations.  If the first iteration that finds points yields a 
 large number of points then performance will suffer since the distance to each 
 of these points will need to be measured to find the closest.  For similar 
 reasons, requesting a large number of closest points in a single call will also 
-impact performance.  The C<Farthest(...)> method is largely a wrapper for 
-C<Closest(...)> and thus exhibits similar behavior.
+impact performance.  The C<L<Farthest(...)|/Farthest(_..._)>> method is largely a wrapper for 
+C<L<Closest(...)|/Closest(_..._)>> and thus exhibits similar behavior.
 
 Some functions within Geo::Index have optional implementations written in C.  If 
 these are active (by default they are whenever possible) searches typically run 
@@ -5086,13 +5191,13 @@ are as follows:
 
 =item
 
-B<C<IndexPoints(...)>>
+B<C<L<IndexPoints(...)|/IndexPoints(_..._)>>>
 
 Points can be added to an index at the rate of about 50,000 per second.
 
 =item
 
-B<C<Search(...)>>
+B<C<L<Search(...)|/Search(_..._)>>>
 
 Typical searches returning values run at about 25,000 to 50,000 searches per 
 second.  Worst-case performance is under 50 searches per second and searches 
@@ -5110,9 +5215,9 @@ being returned.
 
 =item
 
-B<C<SearchByBounds(...)>>
+B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>>
 
-For the C<SearchByBounds(...)> method run time correlates with the 
+For the C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> method run time correlates with the 
 size of the bounding box with smaller bounding boxes typically yielding faster 
 run times.
 
@@ -5125,7 +5230,7 @@ in quick mode.
 
 =item
 
-B<C<Closest(...)>>
+B<C<L<Closest(...)|/Closest(_..._)>>>
 
 For the Closest(...) method the highest performance is seen when there are 
 result points close to the search point.  Search speeds for the single closest 
@@ -5136,7 +5241,7 @@ opposite the search point.
 
 =item
 
-B<C<Farthest(...)>>
+B<C<L<Farthest(...)|/Farthest(_..._)>>>
 
 For the Farthest(...) method the highest performance is seen when there are 
 result points nearly antipodal to the search point.  Search speeds for the 
@@ -5206,7 +5311,7 @@ exists that is suitable for use in this module.
 
 =back
 
-=head1 THEORY OF OPERATION
+=head1 Theory of operation
 
 =head2 Overview
 
@@ -5285,7 +5390,7 @@ points can be found under this key.)
 
 =head2 Basic searching
 
-The C<Search(...)> method is typically used to find all points lying 
+The C<L<Search(...)|/Search(_..._)>> method is typically used to find all points lying 
 within a given radius of a search point.  Two steps are performed by this 
 method: retrieval of preliminary results and filtering of the results based on 
 the search criteria.
@@ -5318,12 +5423,12 @@ If the C<quick_results> option is active then this preliminary list of lists of
 points is returned.  If not then the points are filtered to only include those 
 matching the search criteria.  The filtered points are optionally sorted and 
 then returned.  Note that when large numbers of points have been found this 
-filtering can be very slow; see B<PERFORMANCE> above for details.
+filtering can be very slow; see B<L<Performance|/Performance>> above for details.
 
 =head2 Proximity searching
 
-The C<Closest(...)> and C<Farthest(...)> methods find the points 
-closest to (or farthest from) a search point.  The C<Closest(...)> method 
+The C<L<Closest(...)|/Closest(_..._)>> and C<L<Farthest(...)|/Farthest(_..._)>> methods find the points 
+closest to (or farthest from) a search point.  The C<L<Closest(...)|/Closest(_..._)>> method 
 works as follows:
 
 The search starts at the most detailed level of the index and proceeds to the 
@@ -5353,19 +5458,19 @@ nature of the algorithm tends to place closer points earlier in the results
 there is no inherent order to the points added from a particular index level.
 Lastly, the requested number of result points is returned.
 
-The C<Farthest(...)> method is largely implemented as a wrapper for 
-C<Closest(...)>.  It functions by finding the closest points to the search 
+The C<L<Farthest(...)|/Farthest(_..._)>> method is largely implemented as a wrapper for 
+C<L<Closest(...)|/Closest(_..._)>>.  It functions by finding the closest points to the search 
 point's antipode.
 
 =head2 Searching by bounding box
 
-The C<SearchByBounds(...)> method works much the same as C<Search(...)>
+The C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> method works much the same as C<L<Search(...)|/Search(_..._)>>
 method.  Instead of computing extrema of a search circle, those of the supplied 
-bounding box are used.  The tile level used is C<max( latitude_level, longitude_level )> 
-where C<latitude_level> and C<longitude_level> are the most detailed levels that 
+bounding box are used.  The tile level used is C<max( I<latitude_level>, I<longitude_level> )> 
+where I<C<latitude_level>> and I<C<longitude_level>> are the most detailed levels that 
 could potentially (given their extrema's angular distances) contain their 
 respective extrema within a single tile in each direction.  The remainder of the 
-method is identical to that of C<Search(...)> albeit with all 
+method is identical to that of C<L<Search(...)|/Search(_..._)>> albeit with all 
 distance-related code removed.
 
 =head2 Tile naming (key generation)
@@ -5434,7 +5539,7 @@ used by the index (in meters)
 
 =back
 
-=head1 BUGS AND DEFICIENCIES
+=head1 Bugs and deficiencies
 
 =head3 Known issues
 
@@ -5529,21 +5634,21 @@ or through L<Github|https://github.com/Alex-Kent/Geo-Index/issues>.  In any case
 receive notification when you do and you will be automatically notified of progress 
 on your submission as it takes place. Any other comments can be sent to C<akh@cpan.org>.
 
-=head1 VERSION HISTORY
+=head1 Version history
 
 B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes and minor enhancements
 
 =over
 
-=item * B<C<Sweep(...)>>: New method
+=item * B<C<L<Sweep(...)|/Sweep(_..._)>>>: New method
 
-=item * B<C<Vacuum(...)>>: New method
+=item * B<C<L<Vacuum(...)|/Vacuum(_..._)>>>: New method
 
 =item * Added tests
 
-=item * B<C<SearchByBounds(...)>>: Bug fixes
+=item * B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>>: Bug fixes
 
-=item * B<C<new(...)>>: Added C<quiet> option
+=item * B<C<L<new(...)|/Geo::Index-E<gt>new(_..._)>>>: Added C<quiet> option
 
 =back
 
@@ -5551,20 +5656,20 @@ B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
 
 =over
 
-=item * B<C<Index(...)>>: Fixed bug for points added near (but not at) the north pole
+=item * B<C<L<Index(...)|/Index(_..._)>>>: Fixed bug for points added near (but not at) the north pole
 
-=item * B<C<GetConfiguration(...)>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values
+=item * B<C<L<GetConfiguration( )|/GetConfiguration( )>>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values>
 
 =back
 
 B<0.0.1> (2018-03-30) - Initial release
 
-=head1 AUTHOR
+=head1 Author
 
 Alex Kent Hajnal S<  > C<akh@cpan.org> S<  > L<https://alephnull.net/software>
 
 
-=head1 COPYRIGHT
+=head1 Copyright
 
 Geo::Index
 
