@@ -3,16 +3,22 @@
 # Test swappable low-level functions
 # (Perl, C float, and C double)
 
-use constant test_count => 13;
+use constant test_count => 14;
 
 use strict;
 use warnings;
 use Test::More tests => test_count;
+use Config;
 
 use_ok( 'Geo::Index' );
 
 my $index = Geo::Index->new( { levels=>20 } );
 isa_ok $index, 'Geo::Index', 'Geo::Index object';
+
+my $expecting_numeric_keys = ( $Config{use64bitint} ) ? 1 : 0;
+my %config = $index->GetConfiguration();
+my $have_numeric_keys = ( ( $config{key_type} eq 'numeric' ) || ( $config{key_type} eq 'packed' ) ) ? 1 : 0;
+cmp_ok( $have_numeric_keys, '==', $expecting_numeric_keys, "Key type is sensible" );
 
 my @points = (
                { lat=>78.666667, lon=>16.333333, name=>'Svalbard, Norway' },
