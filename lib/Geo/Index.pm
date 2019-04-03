@@ -84,10 +84,6 @@ use constant ALL => -1;
 
 =encoding utf8
 
-=head1 Geo::Index
-
-Section: User Contributed Perl Documentation (3)
-
 =head1 Name
 
 Geo::Index - Geographic indexer
