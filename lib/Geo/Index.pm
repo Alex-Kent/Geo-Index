@@ -91,11 +91,11 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.3';
+$VERSION = 'v0.0.4_dev';
 
 =head1 VERSION
 
-This document describes Geo::Index version 0.0.3
+This document describes Geo::Index version 0.0.4
 
 =cut
 
@@ -126,13 +126,13 @@ if ($@) {
 }
 	
 #. Choose which C function to export
-@Geo::Index::EXPORT = ();
+@Geo::Index::EXPORT    = qw();  # Symbols to export by default
 #@Geo::Index::EXPORT_OK = qw(
 #    GetCCodeVersion fast_log2_double fast_log2_float ComputeAreaExtrema_float 
 #    ComputeAreaExtrema_double ComputeAreaExtrema_double SetUpDistance_float HaversineDistance_float 
 #    SetUpDistance_double SetUpDistance_double HaversineDistance_double 
 #    );
-@Geo::Index::EXPORT_OK = qw();
+@Geo::Index::EXPORT_OK = qw();  # Symbols to export on request
 
 
 
@@ -408,14 +408,15 @@ Choose the type of low-level functions to use.
 S<(default: 'C<double>' if available, 'C<perl>' otherwise)>
 
 Geo::Index will attempt to use compiled C code to speed up certain calculations.  
-If the compilation fails then equivalent (but slower) Perl code will be used.
+If the compilation fails (or was blocked by the user) then equivalent (but 
+slower) Perl code will be used.
 
 This option can be used to explicitly request the type of code to use.  When set 
 to 'C<float>' then compiled C code using single-precision floating point will 
 be requested.  When set to 'C<double>' then compiled C code using double-precision 
 floating point will be requested.  When set to 'C<perl>' then Perl code will be 
-used.  If compilation failed then Perl code will be used regardless of what was 
-requested.
+used.  If compiled code is unavailable then Perl code will be used regardless of 
+what was requested.
 
 Perl natively uses double-precision floating point.  On modern hardware 
 double-precision is slightly faster than single-precision.  On certain platforms, 
@@ -423,8 +424,6 @@ however, it may be preferable to use single-precision instead of double-precisio
 floating point.  When needed, using single-precision should not be an issue since 
 the minor errors introduced from loss of precision are drowned out by the errors 
 inherent in the haversine function that is used for distance calculations.
-
-Geo::Index uses Inline::C to compile code.
 
 =back
 
@@ -436,7 +435,8 @@ Geo::Index uses Inline::C to compile code.
 
 
 #. Geo::Index uses C code to speed up distance computations.
-#. The following variables hold the current state of the compiled code:
+#. Along with $C_CODE_COMPILED (set near top of this module), the following 
+#. variables hold the current state of the compiled code:
 
 my $ACTIVE_CODE = undef;  #. Set to the type of low-level code currently being used:
                           #. 'perl, 'double', or 'float' (the latter two being C)
@@ -4660,103 +4660,6 @@ In general, C<post_condition> functions should be preferred since the overhead
 of the Perl function call is typically larger than that of the distance 
 calculation.  By checking the distance first, running the C<post_condition> 
 function might not be necessary.
-
-
-
-
-=head1 RUNNING ON A SERVER
-
-If you are running in a server environment and want to use the accelerated C 
-functions but do not want Inline::C to be able to write files to your script's 
-working directory then there are two options available:
-
-=over
-
-=item * B<Pre-build the C code>
-
-To do this log in to the server as yourself (or another user as appropriate) 
-then C<cd> to the script's working directory.  Next, run the following command:
-
- perl -e "use Geo::Index;"
-
-The C code should automatically be compiled and stored in the C<_Inline> 
-subdirectory.  Once this has been done, change permissions and/or ownership of 
-the C<_Inline> subdirectory and its contents to suit your liking.  A simple 
-S<C<chmod -w -R _Inline>> might suffice.
-
-=item * B<Specify a build and library directory>
-
-If you want to use the compiled C functions but don't want the build to be done 
-in the current directory, you can specify an alternate build and library 
-directory here.  The example below creates C<build> and C<lib> directories along 
-with a C<config> file in C</tmp/>.  For your own scripts, change C</tmp> as 
-appropriate for your environment.  The following should appear near the top of 
-your script:
-
-    # Specify the build and library directory
-    use Inline(Config => DIRECTORY => '/tmp');
-    
-    # Load the module
-    use Geo::Index;
-
-An example of doing this can be found in C<examples/inline_c_directory.pl>
-
-B<Important: >The specified directory must exist and be writeable before the script 
-is run.
-
-B<Important: >The lines MUST appear in the order shown.
-
-Further discussion of this method can be found in the L<B<Inline> documentation|https://metacpan.org/pod/Inline#The-Inline-'directory'>.
-
-=back
-
-B<Taint mode>
-
-If your program uses taint mode then you may encounter issues with this module's use of Inline::C.  There are three possible solutions to this:
-
-=over
-
-=item * B<Don't use taint mode>
-
-This  may not be an option for you but is mentioned for completeness.
-To disable taint mode remove the `-T` flag from your invocation of Perl.
-For example, use C<#!/usr/bin/perl> instead of C<#!/usr/bin/perl -T>
-
-=item * B<Pre-build the C code>
-
-This method is similar to that descibed earlier.  When initially invoking Perl be sure to run C<perl SCRIPT.pl> instead of 
-C<perl -T SCRIPT.pl> (where C<SCRIPT.pl> is your program that normally runs under taint mode).  Subsequent invocations 
-should work fine with taint mode on.
-
-=item * B<Allow Inline to untaint things>
-
-This method is quite effective but could be a potential security risk.  If asked,  Inline will 
-L<"blindly [untaint] fields in both C<%ENV> and Inline objects|https://metacpan.org/pod/Inline#untaint> thus allowing 
-Inline::C code to compile and run under taint mode.  Needless to say if you are using taint mode in production you 
-should think carefully before doing this.  To activate this method, Geo::Index should be included in your Perl 
-script as follows:
-        
-    use Inline(Config => DIRECTORY => '/tmp');
-    use Inline(Config => ( ENABLE => 'UNTAINT', NO_UNTAINT_WARN => 1 ) );
-    use Geo::Index;
-
-(Adjust C</tmp> to your liking.)
-
-=back
-
-Further discussion on using taint mode and Inline can be found on these external pages:
-
-=over
-
-=item * L<How do I use Inline with mod_perl?|https://metacpan.org/pod/distribution/Inline-C/lib/Inline/C/Cookbook.pod#mod_perl> in the B<Inline::C Cookbook>
-
-=item * L<C<untaint>|https://metacpan.org/pod/Inline#untaint> in the B<Inline> documentation
-
-=item * L<Taint mode|https://perldoc.perl.org/perlsec.html#Taint-mode> in the B<perlsec> manpage
-
-=item * L<How do I use taint mode?|http://perlmeme.org/howtos/secure_code/taint.html> - A brief introduction
-
-=back
 
 
 
