@@ -23,9 +23,7 @@ DEPENDENCIES
 	Carp, Math::Trig, POSIX (for ceil), Config
 
 If possible, accelerated versions of certain functions will automatically be 
-used.  Use of the accelerated code requires the following:
-
-	Inline::C, a C99-compliant C compiler
+used.  Use of the accelerated code requires a C99-compliant C compiler.
 
 DOCUMENTATION
 
