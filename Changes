@@ -1,5 +1,8 @@
 Revision history for Geo-Index
 
+0.0.4   2019-04-03
+Switched from Inline::C to XS for low-level C functions
+
 0.0.3   2019-04-01
 Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
 

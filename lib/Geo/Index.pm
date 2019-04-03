@@ -91,7 +91,7 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.4_dev';
+$VERSION = 'v0.0.4';
 
 =head1 VERSION
 
@@ -5263,6 +5263,8 @@ receive notification when you do and you will be automatically notified of progr
 on your submission as it takes place. Any other comments can be sent to C<akh@cpan.org>.
 
 =head1 VERSION HISTORY
+
+B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions
 
 B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes and minor enhancements
 
