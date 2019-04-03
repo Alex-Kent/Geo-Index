@@ -84,7 +84,7 @@ use constant ALL => -1;
 
 =encoding utf8
 
-=head1 Name
+=head1 NAME
 
 Geo::Index - Geographic indexer
 
@@ -93,11 +93,11 @@ Geo::Index - Geographic indexer
 use vars qw ($VERSION);
 $VERSION = 'v0.0.3';
 
-=head1 Version
+=head1 VERSION
 
 This document describes Geo::Index version 0.0.3
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
   # Create and populate a geographic index
   
@@ -144,7 +144,7 @@ This document describes Geo::Index version 0.0.3
   $m = $index->DistanceTo( $points[1] );
   printf("Pole to pole:      %i km\n", $m / 1000);
   
-=head1 Description
+=head1 DESCRIPTION
 
 Geo::Index is a Perl module for creating in-memory geographic points indices. 
 Once points have been indexed, fast searches can be run.  
@@ -164,7 +164,7 @@ respectively).
 While by default computations are done for the Earth, other bodies can be used 
 by supplying appropriates radii and circumferences to B<C<L<new(...)|/Geo::Index-E<gt>new( ... )>>>.
 
-=head1 Points
+=head1 POINTS
 
 Geo::Index works with points on a spherical body.  Points are hash references 
 containing, at a minimum, C<lat> and C<lon> entries which give the point's 
@@ -231,7 +231,7 @@ notation use C<$$point{'data'}> where C<$point> is a search result point.
 Any fields added to the indexed points by Geo::Index can be removed using 
 C<L<Sweep(...)|/Sweep(_..._)>> and C<L<Vacuum(...)|/Vacuum(_..._)>>.
 
-=head1 Methods
+=head1 METHODS
 
 =cut
 
@@ -536,7 +536,7 @@ The points to add to the index
 
 Each point in the list is either a reference to a hash containing at a minimum 
 a C<lat> and a C<lon> value (both in degrees) or a reference to an array 
-giving the point.  See the B<L<POINTS|/POINTS>> section above for details.
+giving the point.  See the B<L<Points|/POINTS>> section above for details.
 
 =back
 
@@ -610,7 +610,7 @@ B<C<%point>> or B<C<@point>>
 The point to add to the index
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<L<POINTS|/POINTS>> section above 
+(both in degrees) or an array giving the point.  See the B<L<Points|/POINTS>> section above 
 for details.
 
 =back
@@ -935,7 +935,7 @@ The point to search near
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<L<POINTS|/POINTS>> section above for details.
+See the B<L<Points|/POINTS>> section above for details.
 
 =back
 
@@ -992,7 +992,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -1006,7 +1006,7 @@ should be included in the results.
 This code is run after the distance from the search point to the result point 
 has been calculated.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -1018,7 +1018,7 @@ Arbitrary user-supplied data that is passed to the condition functions.
 
 This can be used to allow the function access to additional data structures.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -1051,7 +1051,7 @@ C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
 To be clear, when this option is active rough radius limiting is done but there 
 is no filtering done, no distances are computed, and no sorting is performed.
 
-See the B<L<Performance|/Performance>> section below for a discussion of this option and when 
+See the B<L<Performance|/PERFORMANCE>> section below for a discussion of this option and when 
 to S<use it>.
 
 =back
@@ -1855,7 +1855,7 @@ condition function is a reference to the bounding box in list form (as described
 above for C<@bounds>).  Lastly, since "distance from search point" makes no 
 sense in the context of a bounding box, none is provided to the function.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -1867,7 +1867,7 @@ Arbitrary user-supplied data that is passed to the condition function.
 
 This can be used to allow the function access to additional data structures.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -1900,7 +1900,7 @@ C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
 To be clear, when this option is active rough bounds limiting is done but there 
 is no filtering done and no bound checks are actually performed.
 
-See the B<L<Performance|/Performance>> section below for a discussion of this 
+See the B<L<Performance|/PERFORMANCE>> section below for a discussion of this 
 option and when to use it.
 
 =back
@@ -2584,7 +2584,7 @@ C<$results_ref = $index-E<gt>Closest( \%point, $number_of_points_desired, \%opti
 Find the point or points closest to a given point
 
 Note that if you want to find the closest points within a given radius it may be 
-faster to use C<L<Search(...)|/Search(_..._)>> instead.  See the B<L<Performance|/Performance>> 
+faster to use C<L<Search(...)|/Search(_..._)>> instead.  See the B<L<Performance|/PERFORMANCE>> 
 section below for more details.
 
 B<C<%point>>
@@ -2595,7 +2595,7 @@ The point to search near
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<L<Points|/Points>> section above for details.
+See the B<L<Points|/POINTS>> section above for details.
 
 =back
 
@@ -2653,7 +2653,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -2671,7 +2671,7 @@ By default, a C<post_condition> function that filters out the search point
 is used.  To remove this default function either specify a new one or set 
 C<post_condition> to "C<NONE>".
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -2683,7 +2683,7 @@ Arbitrary user-supplied data that is passed to the condition functions.
 
 This can be used to allow the function access to additional data structures.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -3331,7 +3331,7 @@ The point to search relative to
 
 This is either a reference to a hash containing at a minimum a C<lat> and a 
 C<lon> value (both in degrees) or a reference to an array giving the point.  
-See the B<L<Points|/Points>> section above for details.
+See the B<L<Points|/POINTS>> section above for details.
 
 =back
 
@@ -3389,7 +3389,7 @@ should be included in the results.
 This code is run before the distance from the search point to the result point 
 has been calculated.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -3407,7 +3407,7 @@ By default, a C<post_condition> function that filters out the search point is
 used.  To remove this default function either specify a new one, set a value for 
 C<user_data>, or set C<post_condition> to "C<NONE>".
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -3423,7 +3423,7 @@ If the default C<post_condition> is active and no C<user_data> value has been
 provided by the caller then this is set to the actual (non-antipodal) search 
 point.
 
-See the B<L<Condition functions|/Condition functions>> section below for syntax.
+See the B<L<Condition functions|/CONDITION FUNCTIONS>> section below for syntax.
 
 =back
 
@@ -3614,7 +3614,7 @@ B<C<%point_1>> or B<C<@point_1>>, B<C<%point_2>> or B<C<@point_2>>
 The points to measure the distance between
 
 These can be either hashes containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or arrays giving each point.  See the B<L<Points|/Points>> 
+(both in degrees) or arrays giving each point.  See the B<L<Points|/POINTS>> 
 section above for details.
 
 =back
@@ -3656,7 +3656,7 @@ B<C<%point_1>> or B<C<@point_1>>
 The point to measure distances from
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<L<Points|/Points>> 
+(both in degrees) or an array giving the point.  See the B<L<Points|/POINTS>> 
 section above for details.
 
 
@@ -3709,7 +3709,7 @@ B<C<%point_2>> or B<C<@point_2>>
 The point to measure distances to
 
 This can be either a hash containing at a minimum a C<lat> and a C<lon> value 
-(both in degrees) or an array giving the point.  See the B<L<Points|/Points>> 
+(both in degrees) or an array giving the point.  See the B<L<Points|/POINTS>> 
 section above for details.
 
 =back
@@ -4846,7 +4846,7 @@ sub GetIndices($$$) {
 
 
 
-=head1 Condition functions
+=head1 CONDITION FUNCTIONS
 
 The C<L<Search(...)|/Search(_..._)>>, C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>, 
 C<L<Closest(...)|/Closest(_..._)>>, and C<L<Farthest(...)|/Farthest(_..._)>> 
@@ -4935,7 +4935,7 @@ function might not be necessary.
 
 
 
-=head1 Running on a server
+=head1 RUNNING ON A SERVER
 
 If you are running in a server environment and want to use the accelerated C 
 functions but do not want Inline::C to be able to write files to your script's 
@@ -5032,7 +5032,7 @@ Further discussion on using taint mode and Inline can be found on these external
 
 
 
-=head1 Performance
+=head1 PERFORMANCE
 
 =head2 Overview
 
@@ -5307,7 +5307,7 @@ exists that is suitable for use in this module.
 
 =back
 
-=head1 Theory of operation
+=head1 THEORY OF OPERATION
 
 =head2 Overview
 
@@ -5419,7 +5419,7 @@ If the C<quick_results> option is active then this preliminary list of lists of
 points is returned.  If not then the points are filtered to only include those 
 matching the search criteria.  The filtered points are optionally sorted and 
 then returned.  Note that when large numbers of points have been found this 
-filtering can be very slow; see B<L<Performance|/Performance>> above for details.
+filtering can be very slow; see B<L<Performance|/PERFORMANCE>> above for details.
 
 =head2 Proximity searching
 
@@ -5535,7 +5535,7 @@ used by the index (in meters)
 
 =back
 
-=head1 Bugs and deficiencies
+=head1 BUGS AND DEFICIENCIES
 
 =head3 Known issues
 
@@ -5630,7 +5630,7 @@ or through L<Github|https://github.com/Alex-Kent/Geo-Index/issues>.  In any case
 receive notification when you do and you will be automatically notified of progress 
 on your submission as it takes place. Any other comments can be sent to C<akh@cpan.org>.
 
-=head1 Version history
+=head1 VERSION HISTORY
 
 B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes and minor enhancements
 
@@ -5660,12 +5660,12 @@ B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
 
 B<0.0.1> (2018-03-30) - Initial release
 
-=head1 Author
+=head1 AUTHOR
 
 Alex Kent Hajnal S<  > C<akh@cpan.org> S<  > L<https://alephnull.net/software>
 
 
-=head1 Copyright
+=head1 COPYRIGHT
 
 Geo::Index
 
