@@ -5,7 +5,6 @@ examples/bounds.pl
 examples/cities.gpx
 examples/cities.txt
 examples/geo_gpx.pl
-examples/inline_c_directory.pl
 examples/quick_results.pl
 examples/sample_benchmark.txt
 examples/search_closest_farthest.pl
@@ -17,9 +16,15 @@ Makefile.PL
 MANIFEST
 README
 README.md
-README.use_on_a_server
 t/00-load.t
 t/boilerplate.t
+t/bounds.t
+t/distance.t
+t/geo_gpx.t
+t/low-level.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/point_storage.t
+t/polar_search.t
+t/simple_search.t
