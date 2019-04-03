@@ -32,7 +32,7 @@ for (my $i=0; $i<10; $i++) {
 	my $_point = $$_points[rand(@$_points)];
 	print "\t$$_point{name}:\n";
 	
-	# Run Search
+	# Run search
 	my $_results = $index->Search( $_point, { sort_results=>1, radius=>1_000_000, pre_condition=>sub { my ($rp, $sp, $d)=@_; return ($rp!=$sp); } } );
 	
 	# The results returned for normal searches is a reference to a list of points

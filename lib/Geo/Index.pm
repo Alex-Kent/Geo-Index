@@ -1113,6 +1113,12 @@ active.
 sub Search($$;$) {
 	my ($self, $_search_point, $_options) = @_;
 	
+	# Allow calling as Closest( POINT, OPTIONS ) when only a single point is desired.
+	if (ref $number_of_points_desired) {
+		$_options = $number_of_points_desired;
+		$number_of_points_desired = 1;
+	}
+	
 	my $_points = $$self{index};
 	
 	if (ref $_search_point eq 'ARRAY') {
