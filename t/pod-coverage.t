@@ -22,6 +22,7 @@ my $_internal_functions = [
                             'ComputeAreaExtrema', 
                             'ComputeAreaExtrema_double', 
                             'ComputeAreaExtrema_float', 
+                            'DeletePointIndex', 
                             'GetCCodeVersion', 
                             'GetDistanceFunctionType', 
                             'GetIndices', 
@@ -44,7 +45,11 @@ my $_internal_functions = [
                             'fast_log2', 
                             'fast_log2_double', 
                             'fast_log2_float', 
-                            'log2'
+                            'log2',
+                            
+                            # Experimental methods:
+                            'CountIndexPoints',
+                            'GetAllIndexPoints'
                           ];
 
 all_pod_coverage_ok( { trustme=>$_internal_functions } );

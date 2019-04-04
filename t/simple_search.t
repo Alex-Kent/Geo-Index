@@ -6,8 +6,6 @@ use strict;
 use warnings;
 use Test::More tests => test_count;
 
-use Data::Dumper;
-
 sub GetPoints();
 
 use_ok( 'Geo::Index' );

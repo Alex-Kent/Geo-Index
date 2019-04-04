@@ -698,7 +698,7 @@ sub Index($$) {
 		}
 		
 		#. Point has moved; delete it so that it can be reindexed
-		DeletePointIndex($self, $_point);
+		UnindexPoint($self, $_point);
 	}
 	
 	$$self{positions}{$_point} = [ $lat, $lon ];
@@ -810,13 +810,13 @@ sub Index($$) {
 
 
 
-=head2 DeletePointIndex( ... )
+=head2 UnindexPoint( ... )
 
 =over
 
-C<$index-E<gt>DeletePointIndex( \%point );>
+C<$index-E<gt>UnindexPoint( \%point );>
 
-Delete specified point from index
+Remove specified point from index
 
 This method will remove the point from the index but will not destroy the 
 actual point.
@@ -825,9 +825,9 @@ B<C<%point>>
 
 =over
 
-The point to delete.
+The point to remove from the index.
 
-Note that this must be a reference to the actual point to delete and not to a 
+Note that this must be a reference to the actual point to remove and not to a 
 copy of it.  Simply specifying a point's location as a new point hash will not 
 work.
 
@@ -835,12 +835,37 @@ work.
 
 =back
 
+---
+
+Added in 0.0.4 to replace the functionally identical (and now deprecated) 
+DeletePointIndex(...).
+
 =cut
 
 
-#. Delete specified point from index
-# Used by Index
+#. Trampoline to handle deprecated method name
 sub DeletePointIndex($$) {
+	my ($self, $_point) = @_;
+	
+	print STDERR "DeletePointIndex(...) is deprecated and will be removed in future.  " .
+	             "Please update your code to use UnindexPoint(...) instead.\n" 
+	             unless $self->{quiet};
+	
+	#. Update method pointer to point to new code
+	*Geo::Index::DeletePointIndex = *Geo::Index::UnindexPoint;
+	
+	#. Fall through to new name
+	if (wantarray) {
+		return $self->UnindexPoint($_point);
+	} else {
+		return scalar $self->UnindexPoint($_point);
+	}
+}
+
+
+#. Remove specified point from index
+# Used by Index
+sub UnindexPoint($$) {
 	my ($self, $_point) = @_;
 	
 	#. Remove the point from the index
@@ -930,7 +955,7 @@ sub AddValue($$$) {
 #. Return the index entry for a given key
 #. Keys are either 64-bit integers or array 
 #. references: [ level, lat_idx, lon_idx ]
-# Used by Search, Closest, DeletePointIndex, Sweep, Vacuum
+# Used by Search, Closest, UnindexPoint, Sweep, Vacuum
 sub GetValue($$) {
 	my ($self, $key) = @_;
 	
@@ -4335,6 +4360,27 @@ sub Vacuum($;$) {
 
 # ==============================================================================
 
+#. These methods are experimental and may be removed in future
+
+# Used by t/trampoline.t
+sub CountIndexPoints($) {
+	my ($self) = @_;
+	return scalar keys %{$self->{indices}}
+}
+
+sub GetAllIndexPoints($) {
+	my ($self) = @_;
+	if (wantarray) {
+		return $self->Search( [0,0] );
+	} else {
+		return scalar $self->Search( [0,0] );
+	}
+}
+
+#. END Experimental methods
+
+# ==============================================================================
+
 #. The code below is only used internally by Geo::Index
 
 
@@ -5208,11 +5254,11 @@ One could fix this by adding object-level locks:
 
 =over
 
-=item * Block concurrent calls to the C<Index(...)> and C<DeletePointIndex(...)>methods
+=item * Block concurrent calls to the C<Index(...)> and C<UnindexPoint(...)>methods
 
-=item * Block calls to the C<Index(...)> and C<DeletePointIndex(...)> methods while searches are running
+=item * Block calls to the C<Index(...)> and C<UnindexPoint(...)> methods while searches are running
 
-=item * Block calls to C<Search(...)> I<et al.> when the C<Index(...)> or C<DeletePointIndex(...)> methods are active 
+=item * Block calls to C<Search(...)> I<et al.> when the C<Index(...)> or C<UnindexPoint(...)> methods are active 
 
 =back
 
