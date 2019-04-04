@@ -5452,7 +5452,7 @@ B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions,
 
 =over
 
-=item * Low-level C code is now in Index.xs.
+=item * Low-level C code is now in C<Index.xs>.
 
 All references to Inline::C have been removed.
 
