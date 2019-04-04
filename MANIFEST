@@ -32,3 +32,4 @@ t/point_storage.t
 t/polar_search.t
 t/simple_search.t
 t/trampoline.t
+t/versions.t
