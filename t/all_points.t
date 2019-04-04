@@ -16,9 +16,6 @@ isa_ok $index, 'Geo::Index', 'Geo::Index object';
 my $_points = GetPoints();
 $index->IndexPoints( $_points );
 
-#my %points_by_name = ( );
-#map { $points_by_name{$_->{name}} = $_; } @$_points;
-
 my $_results;
 my @expected;
 my @results;
