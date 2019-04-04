@@ -31,32 +31,32 @@ my $points;
 
 # Trampoline from DeletePointIndex to Unindex
 
-my $point_count = $index->CountIndexPoints();
+my $point_count = $index->PointCount();
 
 # Test new method name
 $index->Unindex( $new_delhi );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
+is( $index->PointCount(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 # Test old method name
 $index->DeletePointIndex( $svalbard );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
+is( $index->PointCount(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
 
 # Test new method name
 $index->Unindex( $nairobi );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
+is( $index->PointCount(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 # Test old method name
 $index->DeletePointIndex( $north_pole );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
+is( $index->PointCount(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
 
 # Test new method name
 $index->Unindex( $ottawa );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
+is( $index->PointCount(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 
 done_testing;

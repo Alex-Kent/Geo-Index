@@ -19,6 +19,7 @@ MANIFEST
 README
 README.md
 t/00-load.t
+t/all_points.t
 t/boilerplate.t
 t/bounds.t
 t/distance.t
