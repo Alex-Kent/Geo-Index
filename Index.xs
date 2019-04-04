@@ -8,7 +8,7 @@
 
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 0
-#define SUB_VERSION   4
+#define SUB_VERSION   5
 
 /* Do not put void in the parameters below, it'll break XS */ 
 unsigned int GetCCodeVersion( ) {
