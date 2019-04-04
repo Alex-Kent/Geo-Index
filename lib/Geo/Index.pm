@@ -1960,7 +1960,7 @@ bounds will likely be returned as well.
 When iterating over the arrays be sure to check whether a list element is C<undef> 
 before trying to deference it.
 
-An example of returned quick results (in scalar context); POINTs are references 
+An example of returned quick results (in scalar context); B<L<POINTs|/POINTS>> are references 
 to different points:
 
 C<[ [ POINT, POINT, POINT ], [ POINT, POINT ], undef, [ POINT, POINT ] ]>
