@@ -1,6 +1,6 @@
 #!perl
 
-use constant test_count => 6;
+use constant test_count => 7;
 
 use strict;
 use warnings;
@@ -33,6 +33,11 @@ my $points;
 
 my $point_count = $index->CountIndexPoints();
 
+# Test new method name
+$index->UnindexPoint( $new_delhi );
+$point_count--;
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
+
 # Test old method name
 $index->DeletePointIndex( $svalbard );
 $point_count--;
@@ -43,15 +48,15 @@ $index->UnindexPoint( $nairobi );
 $point_count--;
 is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
 
-# Test new method name
-$index->UnindexPoint( $new_delhi );
-$point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
-
 # Test old method name
 $index->DeletePointIndex( $north_pole );
 $point_count--;
 is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: Old method name" );
+
+# Test new method name
+$index->UnindexPoint( $ottawa );
+$point_count--;
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
 
 
 done_testing;
