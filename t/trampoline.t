@@ -29,34 +29,34 @@ $index->IndexPoints( \@points );
 
 my $points;
 
-# Trampoline from DeletePointIndex to UnindexPoint
+# Trampoline from DeletePointIndex to Unindex
 
 my $point_count = $index->CountIndexPoints();
 
 # Test new method name
-$index->UnindexPoint( $new_delhi );
+$index->Unindex( $new_delhi );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 # Test old method name
 $index->DeletePointIndex( $svalbard );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: Old method name" );
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
 
 # Test new method name
-$index->UnindexPoint( $nairobi );
+$index->Unindex( $nairobi );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 # Test old method name
 $index->DeletePointIndex( $north_pole );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: Old method name" );
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: Old method name" );
 
 # Test new method name
-$index->UnindexPoint( $ottawa );
+$index->Unindex( $ottawa );
 $point_count--;
-is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> UnindexPoint: New method name" );
+is( $index->CountIndexPoints(), $point_count, "DeletePointIndex -> Unindex: New method name" );
 
 
 done_testing;

@@ -698,7 +698,7 @@ sub Index($$) {
 		}
 		
 		#. Point has moved; delete it so that it can be reindexed
-		UnindexPoint($self, $_point);
+		Unindex($self, $_point);
 	}
 	
 	$$self{positions}{$_point} = [ $lat, $lon ];
@@ -810,11 +810,11 @@ sub Index($$) {
 
 
 
-=head2 UnindexPoint( ... )
+=head2 Unindex( ... )
 
 =over
 
-C<$index-E<gt>UnindexPoint( \%point );>
+C<$index-E<gt>Unindex( \%point );>
 
 Remove specified point from index
 
@@ -846,24 +846,24 @@ sub DeletePointIndex($$) {
 	my ($self, $_point) = @_;
 	
 	print STDERR "DeletePointIndex(...) is deprecated and will be removed in future.  " .
-	             "Please update your code to use UnindexPoint(...) instead.\n" 
+	             "Please update your code to use Unindex(...) instead.\n" 
 	             unless $self->{quiet};
 	
 	#. Update method pointer to point to new code
-	*Geo::Index::DeletePointIndex = *Geo::Index::UnindexPoint;
+	*Geo::Index::DeletePointIndex = *Geo::Index::Unindex;
 	
 	#. Fall through to new name
 	if (wantarray) {
-		return $self->UnindexPoint($_point);
+		return $self->Unindex($_point);
 	} else {
-		return scalar $self->UnindexPoint($_point);
+		return scalar $self->Unindex($_point);
 	}
 }
 
 
 #. Remove specified point from index
 # Used by Index
-sub UnindexPoint($$) {
+sub Unindex($$) {
 	my ($self, $_point) = @_;
 	
 	#. Remove the point from the index
@@ -953,7 +953,7 @@ sub AddValue($$$) {
 #. Return the index entry for a given key
 #. Keys are either 64-bit integers or array 
 #. references: [ level, lat_idx, lon_idx ]
-# Used by Search, Closest, UnindexPoint, Sweep, Vacuum
+# Used by Search, Closest, Unindex, Sweep, Vacuum
 sub GetValue($$) {
 	my ($self, $key) = @_;
 	
@@ -5252,11 +5252,11 @@ One could fix this by adding object-level locks:
 
 =over
 
-=item * Block concurrent calls to the C<Index(...)> and C<UnindexPoint(...)>methods
+=item * Block concurrent calls to the C<Index(...)> and C<Unindex(...)>methods
 
-=item * Block calls to the C<Index(...)> and C<UnindexPoint(...)> methods while searches are running
+=item * Block calls to the C<Index(...)> and C<Unindex(...)> methods while searches are running
 
-=item * Block calls to C<Search(...)> I<et al.> when the C<Index(...)> or C<UnindexPoint(...)> methods are active 
+=item * Block calls to C<Search(...)> I<et al.> when the C<Index(...)> or C<Unindex(...)> methods are active 
 
 =back
 
@@ -5317,7 +5317,7 @@ B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions,
 All references to Inline::C have been removed.
 
 =item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with 
-B<C<L<UnindexPoint(...)|/UnindexPoint(_..._)>>>
+B<C<L<Unindex(...)|/Unindex(_..._)>>>
 
 =back
 

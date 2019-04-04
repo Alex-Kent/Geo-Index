@@ -6,7 +6,7 @@ Switched from Inline::C to XS for low-level C functions, minor restructuring
   o Switched to XS for C code:
     Low-level C code is now in Index.xs.
     All references to Inline::C have been removed.
-  o Deprecated DeletePointIndex(...) and replaced it with UnindexPoint(...)
+  o Deprecated DeletePointIndex(...) and replaced it with Unindex(...)
 
 0.0.3   2019-04-01
 Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
