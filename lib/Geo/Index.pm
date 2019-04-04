@@ -833,12 +833,10 @@ work.
 
 =back
 
-=back
-
----
-
 Added in 0.0.4 to replace the functionally identical (and now deprecated) 
-DeletePointIndex(...).
+C<DeletePointIndex(...)>.
+
+=back
 
 =cut
 
@@ -5310,7 +5308,19 @@ on your submission as it takes place. Any other comments can be sent to C<akh@cp
 
 =head1 VERSION HISTORY
 
-B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions
+B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions, minor restructuring
+
+=over
+
+=item * Low-level C code is now in Index.xs.
+
+All references to Inline::C have been removed
+
+=item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with 
+B<C<L<UnindexPoint(...)|/UnindexPoint(_..._)>>>
+
+=back
+
 
 B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes and minor enhancements
 
