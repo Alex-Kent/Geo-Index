@@ -3,8 +3,9 @@ Revision history for Geo-Index
 0.0.4   2019-04-03
 Switched from Inline::C to XS for low-level C functions, minor restructuring
 
-  o Low-level C code is now in Index.xs
-    All references to Inline::C have been removed
+  o Switched to XS for C code:
+    Low-level C code is now in Index.xs.
+    All references to Inline::C have been removed.
   o Deprecated DeletePointIndex(...) and replaced it with UnindexPoint(...)
 
 0.0.3   2019-04-01

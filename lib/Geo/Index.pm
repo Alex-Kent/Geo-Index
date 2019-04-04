@@ -5314,7 +5314,7 @@ B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions,
 
 =item * Low-level C code is now in Index.xs.
 
-All references to Inline::C have been removed
+All references to Inline::C have been removed.
 
 =item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with 
 B<C<L<UnindexPoint(...)|/UnindexPoint(_..._)>>>
