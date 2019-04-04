@@ -5436,9 +5436,9 @@ B<0.0.5> (2019-04-04) - Added methods, enhancements
 
 =over
 
-=item * B<C<L<PointCount( )|/PointCount(_)>>>): New method
+=item * B<C<L<PointCount( )|/PointCount(_)>>>: New method
 
-=item * B<C<L<AllPoints( )|/AllPoints(_)>>>): New method
+=item * B<C<L<AllPoints( )|/AllPoints(_)>>>: New method
 
 =item * B<C<L<Sweep(...)|/Sweep(_..._)>>>: Added C<extra_keys> option
 
