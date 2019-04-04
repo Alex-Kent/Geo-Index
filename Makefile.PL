@@ -50,7 +50,7 @@ if ( $ENV{FORCE_C} ) {
 		print STDERR "C compiler found, will attempt to compile C code\n";
 		print STDERR "\n";
 		print STDERR "If the compilation fails you can fall back to using only Perl code by running:\n";
-		print STDERR "FORCE_NO_C=1 $0 @ARGV\n";
+		print STDERR "FORCE_NO_C=1 perl $0 @ARGV\n";
 		print STDERR "\n";
 		
 		# (no config changes needed)
@@ -62,7 +62,7 @@ if ( $ENV{FORCE_C} ) {
 		print STDERR "No C compiler found, falling back to pure Perl version\n";
 		print STDERR "\n";
 		print STDERR "You can force a compilation attempt by running:\n";
-		print STDERR "FORCE_C=1 $0 @ARGV\n";
+		print STDERR "FORCE_C=1 perl $0 @ARGV\n";
 		print STDERR "\n";
 		
 		# Disable C code completely (don't even try to build)
