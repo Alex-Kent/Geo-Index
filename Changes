@@ -1,5 +1,18 @@
 Revision history for Geo-Index
 
+0.0.6   2019-04-05
+Bug fixes, additional tests
+
+  o GetIntLatLon(...): Fixed off-by-one error at the north pole
+    This affected Index(...) and Search(...).
+
+  o GetIntLat(...): Fixed off-by-one error at the north pole
+
+  o More thorough tests
+
+  o Improved documentation
+
+
 0.0.5   2019-04-04
 Added methods, enhancements
 
