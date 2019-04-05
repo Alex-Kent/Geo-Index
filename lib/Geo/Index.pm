@@ -4002,6 +4002,8 @@ C<%configuration = $index-E<gt>GetConfiguration( );>
 
 Returns the running configuration of the Geo::Index object.
 
+See also C<L<GetStatistics(...)|/GetStatistics(_)>> and C<examples/show_configuration.pl>
+
 The return value is a hash with the following entries:
 
 =over
@@ -4123,6 +4125,8 @@ sub GetConfiguration($) {
 C<@stats = $index-E<gt>GetStatistics( );>
 
 Returns statistics regarding the Geo::Index object.
+
+See also C<L<GetConfiguration(...)|/GetConfiguration(_)>> and C<examples/show_configuration.pl>
 
 The return value is a list with one entry per level.  Each list entry is a hash 
 reference giving statistics for a single level of the index and contains the 
