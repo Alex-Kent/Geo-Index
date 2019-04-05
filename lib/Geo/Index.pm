@@ -5333,6 +5333,10 @@ each point's latitude and longitude at the time it was indexed.
 B<C<$self-E<gt>{levels}>> - Number of levels in the index (excluding the 
 global level)
 
+B<C<$self-E<gt>{max_level}>> - The highest-resolution level number (i.e. C<levels> - 1)
+
+B<C<$self-E<gt>{max_size}>> - Number of grid tiles in each direction at most detailed level of index
+
 B<C<$self-E<gt>{planetary_radius}>> - The planetary radius used by the index 
 (in meters)
 
