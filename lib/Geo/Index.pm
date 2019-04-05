@@ -91,11 +91,11 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.5';
+$VERSION = 'v0.0.6';
 
 =head1 VERSION
 
-This document describes Geo::Index version 0.0.5
+This document describes Geo::Index version 0.0.6
 
 =cut
 
@@ -521,7 +521,6 @@ sub new($;$$) {
 	}
 	
 	#. Number of grid tiles in each direction at most detailed level of index
-	$self->{max_size} = 2**($self->{levels} - 1);
 	$self->{max_size} = 2**$self->{levels};
 	
 	#. Index of the highest-resolution level
@@ -1441,7 +1440,9 @@ sub Search($$;$) {
 			$lon_1_idx = ( int( ( $lon_1 + 180.0 ) * $max_size / 360.0 ) % $max_size ) >> $shift;
 			#. END inline
 			
-			#. Keep things from breaking in polar regions
+			#. Make sure latitudes are ordered south then north
+			#. (this is not always the case in polar regions)
+			#. Longitudes can be in either order to allow straddling of antimeridian
 			($lat_0_idx, $lat_1_idx) = ($lat_1_idx, $lat_0_idx) if ($lat_0_idx > $lat_1_idx);
 		} # END Perl
 		
@@ -4523,15 +4524,20 @@ sub AllPoints($) {
 #.    longitude: [ -180 degrees .. 180 degrees )
 #. 
 #. Output ranges are:
-#.    latitude:  [ 0 .. max_size - 1 ]  =  [ 0 .. 2**levels - 1 ]
+#.    latitude:  [ 0 .. max_size ]      =  [ 0 .. 2**levels ]
 #.    longitude: [ 0 .. max_size - 1 ]  =  [ 0 .. 2**levels - 1 ]
+#.
+#. Note that the latitude range includes both poles.  The longitude range only 
+#. includes the antimeridian once and thus its output integer range is one 
+#. smaller.  Code that converts the returned integers to index keys must take 
+#. this into account.
 
 # Used by Index and Search
 sub GetIntLatLon($$) {
 	my ($self, $lat, $lon) = @_;
 	
 	my $lat_int = int( ( $lat + 90.0 )  * $self->{max_size} / 180.0 );
-	$lat_int = $self->{max_size} - 1 if ($lat_int > $self->{max_size});
+	$lat_int = $self->{max_size} if ($lat_int > $self->{max_size});
 	
 	my $lon_int = int( ( $lon + 180.0 ) * $self->{max_size} / 360.0 ) % $self->{max_size};
 	
@@ -4549,14 +4555,17 @@ sub GetIntLatLon($$) {
 #.    latitude:  [ -90 degrees .. 90 degrees ]
 #. 
 #. Output ranges are:
-#.    latitude:  [ 0 .. max_size - 1 ]  =  [ 0 .. 2**levels - 1 ]
+#.    latitude:  [ 0 .. max_size ]  =  [ 0 .. 2**levels ]
+#.
+#. Note that the latitude range includes both poles.  Code that converts the 
+#. returned integer to part of an index keys must take this into account.
 
 # Not used
 sub GetIntLat($$) {
 	my ($self, $lat) = @_;
 	
 	my $lat_int = int( ( $lat + 90.0 )  * $self->{max_size} / 180.0 );
-	$lat_int = $self->{max_size} - 1 if ($lat_int >= $self->{max_size});
+	$lat_int = $self->{max_size} if ($lat_int > $self->{max_size});
 	
 	return ($lat_int);
 }
@@ -5150,7 +5159,7 @@ hash, once for each level.  This is done as follows:
 The point's latitude and longitude are converted to integers.  This is done 
 using a simple linear mapping.  In pseudo-code, the equations used are:
 
- max_size = 2**(levels - 1)
+ max_size = 2**levels
  
  integer_latitude  = floor( ( latitude + 90.0 )  * max_size / 180.0 )
  integer_latitude  = max_size - 1 if (integer_latitude == max_size)
@@ -5432,6 +5441,24 @@ on your submission as it takes place. Any other comments can be sent to C<akh@cp
 
 =head1 VERSION HISTORY
 
+B<0.0.6> (2019-04-05) - Bug fixes, additional tests
+
+=over
+
+=item * B<C<GetIntLatLon(...)>>: Fixed off-by-one error at the north pole
+
+This affected B<C<L<Index(...)|/Index(_..._)>>> and B<C<L<Search(...)|/Search(_..._)>>>.
+
+=item * B<C<GetIntLat(...)>>: Fixed off-by-one error at the north pole
+
+=item * More thorough tests
+
+=item * Improved documentation
+
+=back
+
+
+
 B<0.0.5> (2019-04-04) - Added methods, enhancements
 
 =over
@@ -5456,8 +5483,7 @@ B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions,
 
 All references to Inline::C have been removed.
 
-=item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with 
-B<C<L<Unindex(...)|/Unindex(_..._)>>>
+=item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with B<C<L<Unindex(...)|/Unindex(_..._)>>>
 
 =back
 
