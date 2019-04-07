@@ -1,5 +1,3 @@
-Geo-Index version 0.0.4
-
 Geo::Index allows the creation of in-memory geographic indices of sets of 
 points.  Once an index has been created one can run fast searches against 
 the index.  The module supports search by distance, by bounding box and 
