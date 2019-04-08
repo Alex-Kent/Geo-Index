@@ -45,7 +45,39 @@ my $_internal_functions = [
                             'fast_log2', 
                             'fast_log2_double', 
                             'fast_log2_float', 
-                            'log2'
+                            'log2', 
+                            
+                            # Method aliases:
+                            'add_value', 
+                            'all_points', 
+                            'build_points', 
+                            'closest', 
+                            'distance_from', 
+                            'distance_to', 
+                            'farthest', 
+                            'get_configuration', 
+                            'get_statistics', 
+                            'get_value', 
+                            'index_points', 
+                            'one_degree_in_meters', 
+                            'one_meter_in_degrees', 
+                            'point_count', 
+                            'search_by_bounds', 
+                            'sweep', 
+                            'unindex', 
+                            'vacuum', 
+                            
+                            # Aliases for internally-used methods:
+                            'get_indices', 
+                            'get_int_lat', 
+                            'get_int_lat_lon', 
+                            'get_int_lon', 
+                            'get_low_level_code_type', 
+                            'get_supported_low_level_code_types', 
+                            'haversine_distance', 
+                            'longitude_circumference', 
+                            'set_distance_function_type', 
+                            'set_up_distance' 
                             
                             # Experimental methods:
                           ];

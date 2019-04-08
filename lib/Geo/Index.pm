@@ -91,11 +91,11 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.6';
+$VERSION = 'v0.0.7';
 
 =head1 VERSION
 
-This document describes Geo::Index version 0.0.6
+This document describes Geo::Index version 0.0.7
 
 =cut
 
@@ -4756,6 +4756,86 @@ sub GetIndices($$$) {
 
 
 
+# *** Method aliases ***
+
+sub index;                 *index                = *Index;
+sub index_points;          *index_points         = *IndexPoints;
+sub unindex;               *unindex              = *Unindex;
+
+sub build_points;          *build_points         = *BuildPoints;
+sub add_value;             *add_value            = *AddValue;
+sub get_value;             *get_value            = *GetValue;
+
+sub search;                *search               = *Search;
+sub search_by_bounds;      *search_by_bounds     = *SearchByBounds;
+sub closest;               *closest              = *Closest;
+sub farthest;              *farthest             = *Farthest;
+sub all_points;            *all_points           = *AllPoints;
+
+sub distance;              *distance             = *Distance;
+sub distance_from;         *distance_from        = *DistanceFrom;
+sub distance_to;           *distance_to          = *DistanceTo;
+
+sub one_meter_in_degrees;  *one_meter_in_degrees = *OneMeterInDegrees;
+sub one_degree_in_meters;  *one_degree_in_meters = *OneDegreeInMeters;
+
+sub get_configuration;     *get_configuration    = *GetConfiguration;
+sub get_statistics;        *get_statistics       = *GetStatistics;
+
+sub sweep;                 *sweep                = *Sweep;
+sub vacuum;                *vacuum               = *Vacuum;
+sub point_count;           *point_count          = *PointCount;
+
+# Internal methods:
+
+sub set_distance_function_type;          *set_distance_function_type         = *SetDistanceFunctionType;
+sub get_low_level_code_type;             *get_low_level_code_type            = *GetLowLevelCodeType;
+sub get_supported_low_level_code_types;  *get_supported_low_level_code_types = *GetSupportedLowLevelCodeTypes;
+sub set_up_distance;                     *set_up_distance                    = *SetUpDistance;
+sub haversine_distance;                  *haversine_distance                 = *HaversineDistance;
+sub get_int_lat_lon;                     *get_int_lat_lon                    = *GetIntLatLon;
+sub get_int_lat;                         *get_int_lat                        = *GetIntLat;
+sub get_int_lon;                         *get_int_lon                        = *GetIntLon;
+sub longitude_circumference;             *longitude_circumference            = *LongitudeCircumference;
+sub get_indices;                         *get_indices                        = *GetIndices;
+
+=head2 Alternate method names
+
+Geo::Index uses CamelCase for its method names.
+
+For those who prefer using snake case, alternate method names are provided:
+
+    Method               Alternate name
+    -----------------    --------------------
+    Index                index
+    IndexPoints          index_points
+    Unindex              unindex
+    
+    BuildPoints          build_points
+    AddValue             add_value
+    GetValue             get_value
+    
+    Search               search
+    SearchByBounds       search_by_bounds
+    Closest              closest
+    Farthest             farthest
+    AllPoints            all_points
+    
+    Distance             distance
+    DistanceFrom         distance_from
+    DistanceTo           distance_to
+    
+    OneMeterInDegrees    one_meter_in_degrees
+    OneDegreeInMeters    one_degree_in_meters
+    
+    GetConfiguration     get_configuration
+    GetStatistics        get_statistics
+    
+    Sweep                sweep
+    Vacuum               vacuum
+    PointCount           point_count
+
+
 =head1 CONDITION FUNCTIONS
 
 The C<L<Search(...)|/Search(_..._)>>, C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>, 
@@ -5352,6 +5432,8 @@ used by the index (in meters)
 
 =back
 
+
+
 =head1 BUGS AND DEFICIENCIES
 
 =head3 Known issues
@@ -5448,6 +5530,16 @@ receive notification when you do and you will be automatically notified of progr
 on your submission as it takes place. Any other comments can be sent to C<akh@cpan.org>.
 
 =head1 VERSION HISTORY
+
+B<0.0.7> (2019-04-08) - Methods can now be called using snake case
+
+=over
+
+=item * Added method aliases so that CamelCase methods can also be called using snake_case.
+
+=back
+
+
 
 B<0.0.6> (2019-04-05) - Bug fixes, additional tests
 
