@@ -5624,7 +5624,7 @@ B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
 
 =item * B<C<L<Index(...)|/Index( ... )>>>: Fixed bug for points added near (but not at) the north pole
 
-=item * B<C<L<GetConfiguration( )|/GetConfiguration( )>>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values>
+=item * B<C<L<GetConfiguration( )|/GetConfiguration( )>>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values
 
 =back
 

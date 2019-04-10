@@ -25,6 +25,7 @@ t/boilerplate.t
 t/bounds.t
 t/distance.t
 t/geo_gpx.t
+t/kwalitee.t
 t/low-level.t
 t/manifest.t
 t/pod-coverage.t

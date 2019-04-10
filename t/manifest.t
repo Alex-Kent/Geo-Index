@@ -10,4 +10,17 @@ unless ( $ENV{RELEASE_TESTING} ) {
 
 eval "use Test::CheckManifest 0.9";
 plan skip_all => "Test::CheckManifest 0.9 required" if $@;
-ok_manifest();
+ok_manifest( 
+             { 
+               filter => [ 
+                           qr/\/\.git\//, 
+                           qr/\/\.gitignore/, 
+                           qr/\/Geo-Index-.*\.tar\.gz$/, 
+                           qr/\/PAUSE\.*/, 
+                           qr/\/Index\.(?:bs|c|o)$/, 
+                           qr/\/Makefile\.old$/, 
+                           qr/\/examples\/sample.pl$/, 
+                           qr/\/README.place_names$/ 
+                         ]
+             }
+           );
