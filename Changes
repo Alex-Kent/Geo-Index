@@ -1,6 +1,6 @@
 Revision history for Geo::Index
 
-0.0.7-bis   2019-04-10
+0.0.8   2019-04-10
 Corrected internal links, CPAN release
 
   o Corrected POD links to use spaces instead of underscores

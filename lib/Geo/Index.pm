@@ -91,11 +91,11 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.7-bis';
+$VERSION = 'v0.0.8';
 
 =head1 VERSION
 
-This document describes Geo::Index version 0.0.7-bis
+This document describes Geo::Index version 0.0.8
 
 =cut
 
@@ -5531,7 +5531,7 @@ on your submission as it takes place. Any other comments can be sent to C<akh@cp
 
 =head1 VERSION HISTORY
 
-B<0.0.7-bis> (2019-04-10) - Corrected internal links, CPAN release
+B<0.0.8> (2019-04-10) - Corrected internal links, CPAN release
 
 =over
 
