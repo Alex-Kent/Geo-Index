@@ -189,16 +189,16 @@ if ($@) {
 Geo::Index is a Perl module for creating in-memory geographic points indices. 
 Once points have been indexed, fast searches can be run.  
 
-Efficient searches methods include B<C<L<Search(...)|/Search(_..._)>>> to get all points 
-within a distance from a given point, B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>> to get all 
-points in an given area, B<C<L<Closest(...)|/Closest(_..._)>>> to get the closest points to a 
-given point, and B<C<L<Farthest(...)|/Farthest(_..._)>>> to get the farthest points from a given 
+Efficient searches methods include B<C<L<Search(...)|/Search( ... )>>> to get all points 
+within a distance from a given point, B<C<L<SearchByBounds(...)|/SearchByBounds( ... )>>> to get all 
+points in an given area, B<C<L<Closest(...)|/Closest( ... )>>> to get the closest points to a 
+given point, and B<C<L<Farthest(...)|/Farthest( ... )>>> to get the farthest points from a given 
 point.
 
 Additional methods are provided to compute distances between arbitrary points 
-(E<nbsp>B<C<L<Distance(...)|/Distance(_..._)>>>, B<C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>>, and B<C<L<DistanceTo(...)|/DistanceTo(_..._)>>>E<nbsp>)
+(E<nbsp>B<C<L<Distance(...)|/Distance( ... )>>>, B<C<L<DistanceFrom(...)|/DistanceFrom( ... )>>>, and B<C<L<DistanceTo(...)|/DistanceTo( ... )>>>E<nbsp>)
 and to get the size in meters of one degree or the size in degrees of one meter
-at a given point (B<C<L<OneDegreeInMeters(...)|/OneDegreeInMeters(_..._)>>> and B<C<L<OneMeterInDegrees(...)|/OneMeterInDegrees(_..._)>>>, 
+at a given point (B<C<L<OneDegreeInMeters(...)|/OneDegreeInMeters( ... )>>> and B<C<L<OneMeterInDegrees(...)|/OneMeterInDegrees( ... )>>>, 
 respectively).
 
 While by default computations are done for the Earth, other bodies can be used 
@@ -209,9 +209,9 @@ by supplying appropriates radii and circumferences to B<C<L<new(...)|/Geo::Index
 Geo::Index works with points on a spherical body.  Points are hash references 
 containing, at a minimum, C<lat> and C<lon> entries which give the point's 
 position in degrees.  Additional hash entries can be present and will be both 
-ignored and preserved.  The C<L<Index(...)|/Index(_..._)>>, C<L<IndexPoints(...)|/IndexPoints(_..._)>>,  
-C<L<Search(...)|/Search(_..._)>>, C<L<Closest(...)|/Closest(_..._)>>, C<L<Farthest(...)|/Farthest(_..._)>>, 
-C<L<Distance(...)|/Distance(_..._)>>, C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>, and C<L<DistanceTo(...)|/DistanceTo(_..._)>> 
+ignored and preserved.  The C<L<Index(...)|/Index( ... )>>, C<L<IndexPoints(...)|/IndexPoints( ... )>>,  
+C<L<Search(...)|/Search( ... )>>, C<L<Closest(...)|/Closest( ... )>>, C<L<Farthest(...)|/Farthest( ... )>>, 
+C<L<Distance(...)|/Distance( ... )>>, C<L<DistanceFrom(...)|/DistanceFrom( ... )>>, and C<L<DistanceTo(...)|/DistanceTo( ... )>> 
 methods add additional entries in point hashes.
 
 The hash entries used by Geo::Gpx are shown below.  Apart from C<lat> and C<lon> 
@@ -227,12 +227,12 @@ B<C<lat>> - Point's latitude in degrees [ -90 .. 90 ]
 B<C<lon>> - Point longitude in degrees [ -180 .. 180 )
 
 These two values may be changed but the altered point should then be re-indexed 
-using C<L<Index(...)|/Index(_..._)>> before further searches are run.
+using C<L<Index(...)|/Index( ... )>> before further searches are run.
 
 =item *
 B<C<data>> - The optional user data supplied when a point was created 
 using the array shorthand.  This contents of this field may be freely modified 
-by the user.  See C<L<Index(...)|/Index(_..._)>> and C<L<IndexPoints(...)|/IndexPoints(_..._)>>, below.
+by the user.  See C<L<Index(...)|/Index( ... )>> and C<L<IndexPoints(...)|/IndexPoints( ... )>>, below.
 
 =item *
 B<C<lat_rad>> - The point's latitude in radians [ -pi/2 .. pi/2 ]
@@ -249,13 +249,13 @@ circumference assuming a spherical (not an oblate) body.
 B<C<search_result_distance>> - Distance (in meters) of point from search 
 point of previous search.  The distance computation assumes a spherical body 
 and is computed using a ruggedized version of the haversine formula.  This 
-value is only generated when C<L<Search(...)|/Search(_..._)>> is called with the C<radius> 
-or C<sort_results> option.  See also C<L<Distance(...)|/Distance(_..._)>>, C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>, 
-and C<L<DistanceTo(...)|/DistanceTo(_..._)>>.
+value is only generated when C<L<Search(...)|/Search( ... )>> is called with the C<radius> 
+or C<sort_results> option.  See also C<L<Distance(...)|/Distance( ... )>>, C<L<DistanceFrom(...)|/DistanceFrom( ... )>>, 
+and C<L<DistanceTo(...)|/DistanceTo( ... )>>.
 
 =item *
 B<C<antipode_distance>> - Distance (in meters) of point from search 
-point's antipode as determined by a previous call to C<L<Farthest(...)|/Farthest(_..._)>>.
+point's antipode as determined by a previous call to C<L<Farthest(...)|/Farthest( ... )>>.
 This distance is computed using a ruggedized version of the haversine formula.
 
 =back
@@ -269,7 +269,7 @@ original array.  To access the data field of a point created using the shorthand
 notation use C<$$point{'data'}> where C<$point> is a search result point.
 
 Any fields added to the indexed points by Geo::Index can be removed using 
-C<L<Sweep(...)|/Sweep(_..._)>> and C<L<Vacuum(...)|/Vacuum(_..._)>>.
+C<L<Sweep(...)|/Sweep( ... )>> and C<L<Vacuum(...)|/Vacuum( ... )>>.
 
 =head1 METHODS
 
@@ -2653,7 +2653,7 @@ C<$results = $index-E<gt>Closest( \%point, $number_of_points_desired, \%options 
 Find the point or points closest to a given point
 
 Note that if you want to find the closest points within a given radius it may be 
-faster to use C<L<Search(...)|/Search(_..._)>> instead.  See the B<L<Performance|/PERFORMANCE>> 
+faster to use C<L<Search(...)|/Search( ... )>> instead.  See the B<L<Performance|/PERFORMANCE>> 
 section below for more details.
 
 B<C<%point>>
@@ -3714,8 +3714,8 @@ C<$meters = $index-E<gt>DistanceFrom( \@point_1 );>
 
 Set an initial point to measure distances from
 
-Note that any call to C<L<Distance(...)|/Distance(_..._)>> and some calls to 
-C<L<Search(...)|/Search(_..._)>> (those using the C<radius> or C<sort_results> 
+Note that any call to C<L<Distance(...)|/Distance( ... )>> and some calls to 
+C<L<Search(...)|/Search( ... )>> (those using the C<radius> or C<sort_results> 
 options) will overwrite the initial point set with this method.
 
 B<C<%point_1>> or B<C<@point_1>>
@@ -3764,7 +3764,7 @@ C<$meters = $index-E<gt>DistanceTo( \%point_2 );>
 C<$meters = $index-E<gt>DistanceTo( \@point_2 );>
 
 Returns the distance in meters between the specified point and the one set 
-earlier with C<L<DistanceFrom(...)|/DistanceFrom(_..._)>>.
+earlier with C<L<DistanceFrom(...)|/DistanceFrom( ... )>>.
 
 The haversine function is used to compute the distance.  As this assumes a 
 spherical body the distances returned may show errors.  Using the default 
@@ -4002,7 +4002,7 @@ C<%configuration = $index-E<gt>GetConfiguration( );>
 
 Returns the running configuration of the Geo::Index object.
 
-See also C<L<GetStatistics(...)|/GetStatistics(_)>> and C<examples/show_configuration.pl>
+See also C<L<GetStatistics(...)|/GetStatistics( )>> and C<examples/show_configuration.pl>
 
 The return value is a hash with the following entries:
 
@@ -4126,7 +4126,7 @@ C<@stats = $index-E<gt>GetStatistics( );>
 
 Returns statistics regarding the Geo::Index object.
 
-See also C<L<GetConfiguration(...)|/GetConfiguration(_)>> and C<examples/show_configuration.pl>
+See also C<L<GetConfiguration(...)|/GetConfiguration( )>> and C<examples/show_configuration.pl>
 
 The return value is a list with one entry per level.  Each list entry is a hash 
 reference giving statistics for a single level of the index and contains the 
@@ -4254,7 +4254,7 @@ A list of additional keys to remove can optionally be supplied.  To request
 vacuuming of all points with additional keys specified, use C<undef> instead  
 of C<\%point> or C<\@points>.
 
-See also C<L<Vacuum(...)|/Vacuum(_..._)>>.
+See also C<L<Vacuum(...)|/Vacuum( ... )>>.
 
 B<C<%point>> or B<C<@points>>
 
@@ -4348,7 +4348,7 @@ A list of additional keys to remove can optionally be supplied.  To request
 vacuuming of all points with additional keys specified, use C<undef> instead  
 of C<\%point> or C<\@points>.
 
-See also C<L<Sweep(...)|/Sweep(_..._)>>.
+See also C<L<Sweep(...)|/Sweep( ... )>>.
 
 B<C<%point>> or B<C<@points>>
 
@@ -4619,7 +4619,7 @@ Values are approximate.  The diameters are those for an oblate spheroid but
 the math assumes a sphere.  As one approaches the poles these values get 
 heavily distorted; code that uses them needs to take this into account.
 
-See also C<L<OneDegreeInMeters(...)|/OneDegreeInMeters(_..._)>>.
+See also C<L<OneDegreeInMeters(...)|/OneDegreeInMeters( ... )>>.
 
 B<C<$latitude>>
 
@@ -4683,7 +4683,7 @@ Values are approximate.  The diameters are those for an oblate spheroid but
 the math assumes a sphere.  As one approaches the poles these values get 
 heavily distorted; code that uses them needs to take this into account.
 
-See also C<L<OneMeterInDegrees(...)|/OneMeterInDegrees(_..._)>>.
+See also C<L<OneMeterInDegrees(...)|/OneMeterInDegrees( ... )>>.
 
 B<C<$latitude>>
 
@@ -4838,8 +4838,8 @@ For those who prefer using snake case, alternate method names are provided:
 
 =head1 CONDITION FUNCTIONS
 
-The C<L<Search(...)|/Search(_..._)>>, C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>, 
-C<L<Closest(...)|/Closest(_..._)>>, and C<L<Farthest(...)|/Farthest(_..._)>> 
+The C<L<Search(...)|/Search( ... )>>, C<L<SearchByBounds(...)|/SearchByBounds( ... )>>, 
+C<L<Closest(...)|/Closest( ... )>>, and C<L<Farthest(...)|/Farthest(_..._)>> 
 methods allow a user-supplied condition function to filter potential results.
 
 If present, these condition functions are called for each potential search 
