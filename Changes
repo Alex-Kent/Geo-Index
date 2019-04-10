@@ -1,5 +1,12 @@
 Revision history for Geo::Index
 
+0.0.7-bis   2019-04-10
+Corrected internal links, CPAN release
+
+  o Corrected POD links to use spaces instead of underscores
+  o Uploaded to CPAN
+
+
 0.0.7   2019-04-08
 Methods can now be called using snake case
 
@@ -11,11 +18,8 @@ Bug fixes, additional tests
 
   o GetIntLatLon(...): Fixed off-by-one error at the north pole
     This affected Index(...) and Search(...).
-
   o GetIntLat(...): Fixed off-by-one error at the north pole
-
   o More thorough tests
-
   o Improved documentation
 
 

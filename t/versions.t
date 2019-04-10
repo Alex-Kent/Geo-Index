@@ -15,6 +15,8 @@ isa_ok $index, 'Geo::Index', 'Geo::Index object';
 
 my %config = $index->GetConfiguration();
 
+$config{module_version} =~ s/[^0-9\.]//g;
+
 is( $config{c_code_version}, $config{module_version}, "Perl and C version numbers" );
 
 done_testing;

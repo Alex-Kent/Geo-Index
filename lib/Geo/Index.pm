@@ -91,11 +91,11 @@ Geo::Index - Geographic indexer
 =cut
 
 use vars qw ($VERSION);
-$VERSION = 'v0.0.7';
+$VERSION = 'v0.0.7-bis';
 
 =head1 VERSION
 
-This document describes Geo::Index version 0.0.7
+This document describes Geo::Index version 0.0.7-bis
 
 =cut
 
@@ -4839,7 +4839,7 @@ For those who prefer using snake case, alternate method names are provided:
 =head1 CONDITION FUNCTIONS
 
 The C<L<Search(...)|/Search( ... )>>, C<L<SearchByBounds(...)|/SearchByBounds( ... )>>, 
-C<L<Closest(...)|/Closest( ... )>>, and C<L<Farthest(...)|/Farthest(_..._)>> 
+C<L<Closest(...)|/Closest( ... )>>, and C<L<Farthest(...)|/Farthest( ... )>> 
 methods allow a user-supplied condition function to filter potential results.
 
 If present, these condition functions are called for each potential search 
@@ -4848,14 +4848,14 @@ times for a given point.  The code should return B<TRUE> (e.g. C<1>) if a potent
 point should be included in the results or B<FALSE> (e.g. C<0> or C<undef>) if the 
 point should be excluded.
 
-For C<L<Search(...)|/Search(_..._)>>, C<L<Closest(...)|/Closest(_..._)>>, and 
-C<L<Farthest(...)|/Farthest(_..._)>>, the C<pre_condition> function runs before 
+For C<L<Search(...)|/Search( ... )>>, C<L<Closest(...)|/Closest( ... )>>, and 
+C<L<Farthest(...)|/Farthest( ... )>>, the C<pre_condition> function runs before 
 the distance to the result point has been calculated and the C<post_condition> 
-function runs after it has been calculated. For C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> 
+function runs after it has been calculated. For C<L<SearchByBounds(...)|/SearchByBounds( ... )>> 
 no distances are calculated and the function is simply called once per point.
 
 * Functions can set outside values provided they do not affect any values 
-used internally by C<L<Search(...)|/Search(_..._)>> and so long as those 
+used internally by C<L<Search(...)|/Search( ... )>> and so long as those 
 outside values have no effect on the condition's outcome.  Such behavior is, 
 of course, frowned upon.
 
@@ -4982,14 +4982,14 @@ is faster than
 
 =item * B<Choose an appropriate value for C<levels> when creating the index>
 
-The C<L<Search(...)|/Search(_..._)>> method has best performance when the size of the most 
+The C<L<Search(...)|/Search( ... )>> method has best performance when the size of the most 
 detailed level of the index has a smaller physical size than the radius of a 
 typical search.  For example, if your searches are typically for points within 
 100 meters then an index with C<levels> should be set to at least 18 (~75 meters 
 at the equator) to yield best results; if typical searches have 10 meter radius 
 then C<levels> should be 22.
 
-The C<L<Closest(...)|/Closest(_..._)>> method works best when the most detailed level of the 
+The C<L<Closest(...)|/Closest( ... )>> method works best when the most detailed level of the 
 index contains a single point per tile and search points lie close to potential 
 result points.
 
@@ -5005,15 +5005,15 @@ those matching the search criteria.  An example of this is drawing points on
 a map; if points are clipped to the visible area when they are 
 drawn it may not matter if some of them lie outside of it.
 
-=item * B<Use C<L<Search(...)|/Search(_..._)>> instead of C<L<Closest(...)|/Closest(_..._)>> when you have a search radius.>
+=item * B<Use C<L<Search(...)|/Search( ... )>> instead of C<L<Closest(...)|/Closest( ... )>> when you have a search radius.>
 
-The C<L<Closest(...)|/Closest(_..._)>> function is most efficient when no search radius is 
+The C<L<Closest(...)|/Closest( ... )>> function is most efficient when no search radius is 
 specified or when result points lie very close to the search point.  Closeness 
 is relative to the tile size of the most detailed index level; for the default 
 index depth (C<20>), "very close" is roughly within about 100 meters.
 
 When clipping results to a maximal radius it is typically much faster to use 
-C<L<Search(...)|/Search(_..._)>> with the C<sort_results> and C<max_results> options*.
+C<L<Search(...)|/Search( ... )>> with the C<sort_results> and C<max_results> options*.
 
 For example, to find the closest C<$n> points within distance C<$d> of a point 
 C<$p> it is usually much faster to use
@@ -5045,20 +5045,20 @@ the results and is needed to fully emulate the behavior of C<Closest(...)>.
 
 =head2 Technical discussion
 
-Both C<L<Search(...)|/Search(_..._)>> and C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> are very fast since 
+Both C<L<Search(...)|/Search( ... )>> and C<L<SearchByBounds(...)|/SearchByBounds( ... )>> are very fast since 
 they can find the relevant index tiles in linear time.  Since the time needed to 
 filter the results is directly proportional to the number of points retrieved 
 from the index, best performance occurs when the size of the most detailed tiles 
 is smaller than that of the typical search radius or search bounds.
 
-Searches run using C<L<Closest(...)|/Closest(_..._)>> are done starting from the most 
+Searches run using C<L<Closest(...)|/Closest( ... )>> are done starting from the most 
 detailed level and work upwards.  Best performance occurs when a result is found 
 in the first few iterations.  If the first iteration that finds points yields a 
 large number of points then performance will suffer since the distance to each 
 of these points will need to be measured to find the closest.  For similar 
 reasons, requesting a large number of closest points in a single call will also 
-impact performance.  The C<L<Farthest(...)|/Farthest(_..._)>> method is largely a wrapper for 
-C<L<Closest(...)|/Closest(_..._)>> and thus exhibits similar behavior.
+impact performance.  The C<L<Farthest(...)|/Farthest( ... )>> method is largely a wrapper for 
+C<L<Closest(...)|/Closest( ... )>> and thus exhibits similar behavior.
 
 Some functions within Geo::Index have optional implementations written in C.  If 
 these are active (by default they are whenever possible) searches typically run 
@@ -5080,13 +5080,13 @@ are as follows:
 
 =item
 
-B<C<L<IndexPoints(...)|/IndexPoints(_..._)>>>
+B<C<L<IndexPoints(...)|/IndexPoints( ... )>>>
 
 Points can be added to an index at the rate of about 50,000 per second.
 
 =item
 
-B<C<L<Search(...)|/Search(_..._)>>>
+B<C<L<Search(...)|/Search( ... )>>>
 
 Typical searches returning values run at about 25,000 to 50,000 searches per 
 second.  Worst-case performance is under 50 searches per second and searches 
@@ -5104,9 +5104,9 @@ being returned.
 
 =item
 
-B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>>
+B<C<L<SearchByBounds(...)|/SearchByBounds( ... )>>>
 
-For the C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> method run time correlates with the 
+For the C<L<SearchByBounds(...)|/SearchByBounds( ... )>> method run time correlates with the 
 size of the bounding box with smaller bounding boxes typically yielding faster 
 run times.
 
@@ -5119,7 +5119,7 @@ in quick mode.
 
 =item
 
-B<C<L<Closest(...)|/Closest(_..._)>>>
+B<C<L<Closest(...)|/Closest( ... )>>>
 
 For the Closest(...) method the highest performance is seen when there are 
 result points close to the search point.  Search speeds for the single closest 
@@ -5130,7 +5130,7 @@ opposite the search point.
 
 =item
 
-B<C<L<Farthest(...)|/Farthest(_..._)>>>
+B<C<L<Farthest(...)|/Farthest( ... )>>>
 
 For the Farthest(...) method the highest performance is seen when there are 
 result points nearly antipodal to the search point.  Search speeds for the 
@@ -5279,7 +5279,7 @@ points can be found under this key.)
 
 =head2 Basic searching
 
-The C<L<Search(...)|/Search(_..._)>> method is typically used to find all points lying 
+The C<L<Search(...)|/Search( ... )>> method is typically used to find all points lying 
 within a given radius of a search point.  Two steps are performed by this 
 method: retrieval of preliminary results and filtering of the results based on 
 the search criteria.
@@ -5316,8 +5316,8 @@ filtering can be very slow; see B<L<Performance|/PERFORMANCE>> above for details
 
 =head2 Proximity searching
 
-The C<L<Closest(...)|/Closest(_..._)>> and C<L<Farthest(...)|/Farthest(_..._)>> methods find the points 
-closest to (or farthest from) a search point.  The C<L<Closest(...)|/Closest(_..._)>> method 
+The C<L<Closest(...)|/Closest( ... )>> and C<L<Farthest(...)|/Farthest( ... )>> methods find the points 
+closest to (or farthest from) a search point.  The C<L<Closest(...)|/Closest( ... )>> method 
 works as follows:
 
 The search starts at the most detailed level of the index and proceeds to the 
@@ -5347,19 +5347,19 @@ nature of the algorithm tends to place closer points earlier in the results
 there is no inherent order to the points added from a particular index level.
 Lastly, the requested number of result points is returned.
 
-The C<L<Farthest(...)|/Farthest(_..._)>> method is largely implemented as a wrapper for 
-C<L<Closest(...)|/Closest(_..._)>>.  It functions by finding the closest points to the search 
+The C<L<Farthest(...)|/Farthest( ... )>> method is largely implemented as a wrapper for 
+C<L<Closest(...)|/Closest( ... )>>.  It functions by finding the closest points to the search 
 point's antipode.
 
 =head2 Searching by bounding box
 
-The C<L<SearchByBounds(...)|/SearchByBounds(_..._)>> method works much the same as C<L<Search(...)|/Search(_..._)>>
+The C<L<SearchByBounds(...)|/SearchByBounds( ... )>> method works much the same as C<L<Search(...)|/Search( ... )>>
 method.  Instead of computing extrema of a search circle, those of the supplied 
 bounding box are used.  The tile level used is C<max( I<latitude_level>, I<longitude_level> )> 
 where I<C<latitude_level>> and I<C<longitude_level>> are the most detailed levels that 
 could potentially (given their extrema's angular distances) contain their 
 respective extrema within a single tile in each direction.  The remainder of the 
-method is identical to that of C<L<Search(...)|/Search(_..._)>> albeit with all 
+method is identical to that of C<L<Search(...)|/Search( ... )>> albeit with all 
 distance-related code removed.
 
 =head2 Tile naming (key generation)
@@ -5531,6 +5531,18 @@ on your submission as it takes place. Any other comments can be sent to C<akh@cp
 
 =head1 VERSION HISTORY
 
+B<0.0.7-bis> (2019-04-10) - Corrected internal links, CPAN release
+
+=over
+
+=item * Corrected POD links to use spaces instead of underscores
+
+=item * Uploaded to CPAN
+
+=back
+
+
+
 B<0.0.7> (2019-04-08) - Methods can now be called using snake case
 
 =over
@@ -5547,7 +5559,7 @@ B<0.0.6> (2019-04-05) - Bug fixes, additional tests
 
 =item * B<C<GetIntLatLon(...)>>: Fixed off-by-one error at the north pole
 
-This affected B<C<L<Index(...)|/Index(_..._)>>> and B<C<L<Search(...)|/Search(_..._)>>>.
+This affected B<C<L<Index(...)|/Index( ... )>>> and B<C<L<Search(...)|/Search( ... )>>>.
 
 =item * B<C<GetIntLat(...)>>: Fixed off-by-one error at the north pole
 
@@ -5563,13 +5575,13 @@ B<0.0.5> (2019-04-04) - Added methods, enhancements
 
 =over
 
-=item * B<C<L<PointCount( )|/PointCount(_)>>>: New method
+=item * B<C<L<PointCount( )|/PointCount( )>>>: New method
 
-=item * B<C<L<AllPoints( )|/AllPoints(_)>>>: New method
+=item * B<C<L<AllPoints( )|/AllPoints( )>>>: New method
 
-=item * B<C<L<Sweep(...)|/Sweep(_..._)>>>: Added C<extra_keys> option
+=item * B<C<L<Sweep(...)|/Sweep( ... )>>>: Added C<extra_keys> option
 
-=item * B<C<L<Vacuum(...)|/Vacuum(_..._)>>>: Added C<extra_keys> option
+=item * B<C<L<Vacuum(...)|/Vacuum( ... )>>>: Added C<extra_keys> option
 
 =back
 
@@ -5583,7 +5595,7 @@ B<0.0.4> (2019-04-03) - Switched from Inline::C to XS for low-level C functions,
 
 All references to Inline::C have been removed.
 
-=item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with B<C<L<Unindex(...)|/Unindex(_..._)>>>
+=item * Deprecated B<C<DeletePointIndex(...)>> and replaced it with B<C<L<Unindex(...)|/Unindex( ... )>>>
 
 =back
 
@@ -5593,13 +5605,13 @@ B<0.0.3> (2019-04-01) - Added Vacuum(...), Sweep(...), and tests plus bug fixes 
 
 =over
 
-=item * B<C<L<Sweep(...)|/Sweep(_..._)>>>: New method
+=item * B<C<L<Sweep(...)|/Sweep( ... )>>>: New method
 
-=item * B<C<L<Vacuum(...)|/Vacuum(_..._)>>>: New method
+=item * B<C<L<Vacuum(...)|/Vacuum( ... )>>>: New method
 
 =item * Added tests
 
-=item * B<C<L<SearchByBounds(...)|/SearchByBounds(_..._)>>>: Bug fixes
+=item * B<C<L<SearchByBounds(...)|/SearchByBounds( ... )>>>: Bug fixes
 
 =item * B<C<L<new(...)|/Geo::Index-E<gt>new(_..._)>>>: Added C<quiet> option
 
@@ -5610,7 +5622,7 @@ B<0.0.2> (2019-03-31) - Bug fixes and minor enhancements
 
 =over
 
-=item * B<C<L<Index(...)|/Index(_..._)>>>: Fixed bug for points added near (but not at) the north pole
+=item * B<C<L<Index(...)|/Index( ... )>>>: Fixed bug for points added near (but not at) the north pole
 
 =item * B<C<L<GetConfiguration( )|/GetConfiguration( )>>>: Added C<supported_key_types>, C<supported_code_types>, and C<tile_meters> values>
 
