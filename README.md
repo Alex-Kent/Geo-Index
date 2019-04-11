@@ -8,3 +8,5 @@ By default indexing is done for the Earth but other bodies can be indexed by
 supplying appropriates radii and circumferences.
 
 See the [project's wiki](https://github.com/Alex-Kent/Geo-Index/wiki) for full details and documentation.
+
+This module is also available via [CPAN](https://metacpan.org/release/Geo-Index).

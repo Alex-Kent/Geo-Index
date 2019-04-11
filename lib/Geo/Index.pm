@@ -209,10 +209,22 @@ by supplying appropriates radii and circumferences to B<C<L<new(...)|/Geo::Index
 Geo::Index works with points on a spherical body.  Points are hash references 
 containing, at a minimum, C<lat> and C<lon> entries which give the point's 
 position in degrees.  Additional hash entries can be present and will be both 
-ignored and preserved.  The C<L<Index(...)|/Index( ... )>>, C<L<IndexPoints(...)|/IndexPoints( ... )>>,  
+ignored and preserved.
+
+As a convenience, most methods allow points to be specified using a shorthand 
+notation S<C<[ I<lat>, I<lon> ]>> or S<C<[ I<lat>, I<lon>, I<data> ]>>.  Points 
+given in this notation will be converted to hash-based points.  If a point 
+created using this notation is returned as a search result it will be as a 
+reference to the hash constructed by Geo::Index and not as a reference to the 
+original array.  To access the data field of a point created using the shorthand 
+notation use C<$$point{'data'}> where C<$point> is a search result point.
+
+The C<L<Index(...)|/Index( ... )>>, C<L<IndexPoints(...)|/IndexPoints( ... )>>,  
 C<L<Search(...)|/Search( ... )>>, C<L<Closest(...)|/Closest( ... )>>, C<L<Farthest(...)|/Farthest( ... )>>, 
 C<L<Distance(...)|/Distance( ... )>>, C<L<DistanceFrom(...)|/DistanceFrom( ... )>>, and C<L<DistanceTo(...)|/DistanceTo( ... )>> 
-methods add additional entries in point hashes.
+methods add additional entries in point hashes as described below.
+Any fields added to the indexed points by Geo::Index can be safely removed using 
+C<L<Sweep(...)|/Sweep( ... )>> and C<L<Vacuum(...)|/Vacuum( ... )>>.
 
 The hash entries used by Geo::Gpx are shown below.  Apart from C<lat> and C<lon> 
 these values are created by Geo::Gpx.  Unless noted, these values may be read but 
@@ -259,17 +271,6 @@ point's antipode as determined by a previous call to C<L<Farthest(...)|/Farthest
 This distance is computed using a ruggedized version of the haversine formula.
 
 =back
-
-As a convenience, most methods allow points to be specified using a shorthand 
-notation S<C<[ I<lat>, I<lon> ]>> or S<C<[ I<lat>, I<lon>, I<data> ]>>.  Points 
-given in this notation will be converted to hash-based points.  If a point 
-created using this notation is returned as a search result it will be as a 
-reference to the hash constructed by Geo::Index and not as a reference to the 
-original array.  To access the data field of a point created using the shorthand 
-notation use C<$$point{'data'}> where C<$point> is a search result point.
-
-Any fields added to the indexed points by Geo::Index can be removed using 
-C<L<Sweep(...)|/Sweep( ... )>> and C<L<Vacuum(...)|/Vacuum( ... )>>.
 
 =head1 METHODS
 
@@ -4254,6 +4255,9 @@ A list of additional keys to remove can optionally be supplied.  To request
 vacuuming of all points with additional keys specified, use C<undef> instead  
 of C<\%point> or C<\@points>.
 
+Note that running further searches may result in the removed data being 
+recreated.
+
 See also C<L<Vacuum(...)|/Vacuum( ... )>>.
 
 B<C<%point>> or B<C<@points>>
@@ -4347,6 +4351,9 @@ all generated data from all points.
 A list of additional keys to remove can optionally be supplied.  To request 
 vacuuming of all points with additional keys specified, use C<undef> instead  
 of C<\%point> or C<\@points>.
+
+Note that running further searches or measuring distances may result in the 
+removed data being recreated.
 
 See also C<L<Sweep(...)|/Sweep( ... )>>.
 
@@ -5208,9 +5215,10 @@ A given index comprises sets of tiles at various zoom levels with each tile
 containing a list of the points that lie within it.  The lowest level of the 
 index covers the entire globe.  Each higher index level contains twice as many 
 tiles in each direction.  At each zoom level points are linearly mapped to 
-grid tiles based on their latitudes and longitudes using an equirectangular 
-projection.  This is fairly analogous to how typical web slippy maps are 
-organized (though they use a pseudo-mercator projection).
+grid tiles based on their latitudes and longitudes using an 
+L<equirectangular projection|https://en.wikipedia.org/wiki/Equirectangular_projection>.  
+This is fairly analogous to how typical web slippy maps are 
+organized (though they use a L<pseudo-mercator projection|https://en.wikipedia.org/wiki/Web_Mercator_projection>).
 
 As one approaches the poles the tiles become increasingly distorted with the 
 area (in square meters) covered by each tile becoming progressively smaller.
